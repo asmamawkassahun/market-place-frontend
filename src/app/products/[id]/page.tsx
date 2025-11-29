@@ -87,7 +87,7 @@ export default function ProductDetailPage() {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="space-y-4">
               <Skeleton className="aspect-square rounded-lg" />
@@ -112,7 +112,7 @@ export default function ProductDetailPage() {
   if (error || !currentProduct) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <p className="text-destructive mb-4">{error || 'Product not found'}</p>
             <Link href="/products">
@@ -129,7 +129,7 @@ export default function ProductDetailPage() {
 
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         {/* Breadcrumb */}
         <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-6">
           <Link href="/" className="hover:text-primary">Home</Link>
@@ -234,7 +234,7 @@ export default function ProductDetailPage() {
                 onClick={handleAddToCart}
                 disabled={!selectedSku || isAddingToCart}
                 size="lg"
-                className="flex-1"
+                className="flex-1 cursor-pointer"
               >
                 {isAddingToCart ? (
                   <Skeleton className="h-4 w-4 mr-2" />
@@ -244,11 +244,11 @@ export default function ProductDetailPage() {
                 {!isAuthenticated ? 'Login to Add to Cart' : 'Add to Cart'}
               </Button>
               
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" className="cursor-pointer">
                 <Heart className="h-4 w-4" />
               </Button>
               
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" className="cursor-pointer">
                 <Share2 className="h-4 w-4" />
               </Button>
             </div>
@@ -276,7 +276,7 @@ export default function ProductDetailPage() {
                         </p>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="cursor-pointer">
                       <MessageCircle className="h-4 w-4 mr-2" />
                       Chat
                     </Button>
@@ -307,10 +307,10 @@ export default function ProductDetailPage() {
         <div className="mt-12">
           <Tabs defaultValue="description" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="description">Description</TabsTrigger>
-              <TabsTrigger value="reviews">Reviews ({reviewCount})</TabsTrigger>
-              <TabsTrigger value="qna">Q&A</TabsTrigger>
-              <TabsTrigger value="shipping">Shipping</TabsTrigger>
+              <TabsTrigger className="cursor-pointer" value="description">Description</TabsTrigger>
+              <TabsTrigger className="cursor-pointer" value="reviews">Reviews ({reviewCount})</TabsTrigger>
+              <TabsTrigger className="cursor-pointer" value="qna">Q&A</TabsTrigger>
+              <TabsTrigger className="cursor-pointer" value="shipping">Shipping</TabsTrigger>
             </TabsList>
             
             <TabsContent value="description" className="mt-6">

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -78,8 +77,24 @@ export function ProductCard({
   const averageRating = getAverageRating()
   const reviewCount = getReviewCount()
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on interactive elements
+    const target = e.target as HTMLElement
+    if (
+      target.closest('button') ||
+      target.closest('a') ||
+      target.closest('[role="button"]')
+    ) {
+      return
+    }
+    router.push(`/products/${product.id}`)
+  }
+
   return (
-    <Card className={className}>
+    <Card 
+      className={`cursor-pointer ${className || ''}`}
+      onClick={handleCardClick}
+    >
       <CardContent className="p-0">
         {/* Product Image */}
         <div className="relative aspect-square overflow-hidden rounded-t-lg">
@@ -101,6 +116,7 @@ export function ProductCard({
             variant="ghost"
             size="icon"
             className="absolute top-2 right-2 h-8 w-8 rounded-full bg-background/80 hover:bg-background"
+            onClick={(e) => e.stopPropagation()}
           >
             <Heart className="h-4 w-4" />
           </Button>
@@ -109,11 +125,9 @@ export function ProductCard({
         {/* Product Info */}
         <div className="p-4 space-y-3">
           {/* Product Name */}
-          <Link href={`/products/${product.id}`}>
-            <h3 className="font-semibold line-clamp-2 hover:text-primary transition-colors">
-              {product.name}
-            </h3>
-          </Link>
+          <h3 className="font-semibold line-clamp-2 hover:text-primary transition-colors">
+            {product.name}
+          </h3>
 
           {/* Merchant Info */}
           {showMerchant && product.merchant && (
@@ -156,7 +170,10 @@ export function ProductCard({
                     key={sku.id}
                     variant={selectedSku?.id === sku.id ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setSelectedSku(sku)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSelectedSku(sku)
+                    }}
                     className="h-8 text-xs"
                   >
                     {sku.unitType}
@@ -174,8 +191,12 @@ export function ProductCard({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setQuantity(Math.max(1, quantity - selectedSku.unitIncrement))}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setQuantity(Math.max(1, quantity - selectedSku.unitIncrement))
+                  }}
                   disabled={quantity <= selectedSku.unitIncrement}
+                  className='cursor-pointer'
                 >
                   -
                 </Button>
@@ -185,7 +206,11 @@ export function ProductCard({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setQuantity(quantity + selectedSku.unitIncrement)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setQuantity(quantity + selectedSku.unitIncrement)
+                  }}
+                  className='cursor-pointer'
                 >
                   +
                 </Button>
@@ -209,11 +234,11 @@ export function ProductCard({
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-4 pt-0" onClick={(e) => e.stopPropagation()}>
         <Button
           onClick={handleAddToCart}
           disabled={!selectedSku || isLoading}
-          className="w-full"
+          className="w-full cursor-pointer"
         >
           {isLoading ? (
             <Skeleton className="h-4 w-4 mr-2" />

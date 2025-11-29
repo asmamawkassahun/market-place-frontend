@@ -43,13 +43,13 @@ export default function HomePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/products">
-                  <Button size="lg" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full sm:w-auto cursor-pointer">
                     <ShoppingCart className="mr-2 h-4 w-4" />
                     Start Shopping
                   </Button>
                 </Link>
                 <Link href="/merchants">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto cursor-pointer">
                     Find Merchants
                   </Button>
                 </Link>
@@ -130,12 +130,12 @@ export default function HomePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/login">
-                  <Button size="lg" className="w-full sm:w-auto">
+                  <Button size="lg" className="w-full sm:w-auto cursor-pointer">
                     Get Started
                   </Button>
                 </Link>
                 <Link href="/merchants">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto cursor-pointer py-4">
                     Become a Merchant
                   </Button>
                 </Link>

@@ -103,12 +103,12 @@ export default function MerchantDetailPage() {
   if (merchantError) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <Store className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h2 className="text-2xl font-bold mb-2">Merchant Not Found</h2>
             <p className="text-muted-foreground mb-6">{merchantError}</p>
-            <Button onClick={() => router.back()}>
+            <Button onClick={() => router.back()} className='cursor-pointer'>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Go Back
             </Button>
@@ -121,7 +121,7 @@ export default function MerchantDetailPage() {
   if (merchantLoading) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin" />
             <span className="ml-2">Loading merchant...</span>
@@ -134,14 +134,14 @@ export default function MerchantDetailPage() {
   if (!merchant) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <Store className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h2 className="text-2xl font-bold mb-2">Merchant Not Found</h2>
             <p className="text-muted-foreground mb-6">
               The merchant you're looking for doesn't exist or has been removed.
             </p>
-            <Button onClick={() => router.back()}>
+            <Button onClick={() => router.back()} className='cursor-pointer'>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Go Back
             </Button>
@@ -155,12 +155,12 @@ export default function MerchantDetailPage() {
 
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         {/* Back Button */}
         <Button 
           variant="ghost" 
           onClick={() => router.back()}
-          className="mb-6"
+          className="mb-6 cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
@@ -197,11 +197,11 @@ export default function MerchantDetailPage() {
                   </div>
                   
                   <div className="flex flex-col sm:flex-row gap-2">
-                    <Button onClick={handleContactMerchant}>
+                    <Button className='cursor-pointer' onClick={handleContactMerchant}>
                       <MessageCircle className="h-4 w-4 mr-2" />
                       Contact
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" className='cursor-pointer'>
                       <Phone className="h-4 w-4 mr-2" />
                       Call
                     </Button>

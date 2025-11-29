@@ -93,7 +93,7 @@ export default function MerchantDashboardPage() {
   if (!isAuthenticated || !isMerchant) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
@@ -109,7 +109,7 @@ export default function MerchantDashboardPage() {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
@@ -120,7 +120,7 @@ export default function MerchantDashboardPage() {
 
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Merchant Dashboard</h1>

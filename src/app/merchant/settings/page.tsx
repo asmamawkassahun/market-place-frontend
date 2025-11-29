@@ -217,7 +217,7 @@ export default function MerchantSettingsPage() {
   if (!isAuthenticated || !isMerchant) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <SettingsIcon className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
@@ -233,7 +233,7 @@ export default function MerchantSettingsPage() {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <SettingsIcon className="h-16 w-16 mx-auto text-muted-foreground mb-4 animate-pulse" />
             <h1 className="text-2xl font-bold mb-2">Loading Settings...</h1>
@@ -248,7 +248,7 @@ export default function MerchantSettingsPage() {
 
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Settings</h1>

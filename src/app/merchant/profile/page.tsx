@@ -180,7 +180,7 @@ export default function MerchantProfilePage() {
   if (!isAuthenticated || !isMerchant) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <Store className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
@@ -196,7 +196,7 @@ export default function MerchantProfilePage() {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
@@ -208,7 +208,7 @@ export default function MerchantProfilePage() {
   if (!currentMerchant) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <Store className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold mb-2">Merchant Not Found</h1>
@@ -226,7 +226,7 @@ export default function MerchantProfilePage() {
 
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>

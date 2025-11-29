@@ -83,7 +83,7 @@ export default function OrderDetailPage() {
   if (!isAuthenticated) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Please Login</h1>
             <p className="text-muted-foreground mb-6">
@@ -101,7 +101,7 @@ export default function OrderDetailPage() {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="space-y-6">
             <Skeleton className="h-8 w-48" />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -123,7 +123,7 @@ export default function OrderDetailPage() {
   if (error || !currentOrder) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <AlertCircle className="h-16 w-16 mx-auto text-destructive mb-4" />
             <h1 className="text-2xl font-bold mb-2">Order Not Found</h1>
@@ -147,7 +147,7 @@ export default function OrderDetailPage() {
 
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         {/* Header */}
         <div className="flex items-center space-x-4 mb-8">
           <Link href="/orders">

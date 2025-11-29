@@ -146,7 +146,7 @@ export function MerchantCard({
       <CardFooter className="p-4 pt-0">
         <div className="flex items-center space-x-2 w-full">
           <Link href={`/merchants/${merchant.id}`} className="flex-1">
-            <Button variant="outline" size="sm" className="w-full">
+            <Button variant="outline" size="sm" className="w-full cursor-pointer">
               <ExternalLink className="h-4 w-4 mr-2" />
               View Store
             </Button>
@@ -155,6 +155,7 @@ export function MerchantCard({
             <Button
               variant="outline"
               size="sm"
+              className="cursor-pointer"
             onClick={() => setChatOpen(true)}
             title="Send message"
             >

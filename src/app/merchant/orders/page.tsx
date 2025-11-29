@@ -132,7 +132,7 @@ export default function MerchantOrdersPage() {
   if (!isAuthenticated || !isMerchant) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
@@ -147,7 +147,7 @@ export default function MerchantOrdersPage() {
 
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>

@@ -6,7 +6,7 @@ import { GiftRegistryManager } from '@/components/gift-registry/gift-registry-ma
 export default function GiftRegistryPage() {
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         <GiftRegistryManager />
       </div>
     </MainLayout>

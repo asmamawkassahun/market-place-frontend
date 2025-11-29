@@ -6,7 +6,7 @@ import { PriceAlertButton } from '@/components/price-alerts/price-alert-button'
 export default function PriceAlertsPage() {
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold">Price Alerts</h1>

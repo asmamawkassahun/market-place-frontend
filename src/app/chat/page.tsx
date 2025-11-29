@@ -51,7 +51,7 @@ export default function ChatPage() {
   if (!isAuthenticated) {
     return (
       <MainLayout>
-        <div className="container py-8 text-center">
+        <div className="container mx-auto py-8 text-center">
           <MessageCircle className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
           <h1 className="text-2xl font-bold mb-2">Please Login</h1>
           <p className="text-muted-foreground mb-6">You need to be logged in to access chat</p>
@@ -65,7 +65,7 @@ export default function ChatPage() {
 
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Messages</h1>
           <p className="text-muted-foreground">Chat with merchants about your orders</p>

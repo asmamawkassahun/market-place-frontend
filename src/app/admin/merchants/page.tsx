@@ -107,7 +107,7 @@ export default function AdminMerchantsPage() {
   if (!isAuthenticated || !isAdmin) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <Shield className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
@@ -122,7 +122,7 @@ export default function AdminMerchantsPage() {
 
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>

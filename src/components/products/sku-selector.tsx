@@ -102,6 +102,7 @@ export function SKUSelector({
                   size="sm"
                   onClick={() => handleQuantityChange(qty)}
                   disabled={disabled}
+                  className="cursor-pointer"
                 >
                   {formatUnit(qty, selectedSku.unitType)}
                 </Button>
@@ -124,6 +125,7 @@ export function SKUSelector({
                 size="sm"
                 onClick={handleCustomQuantitySubmit}
                 disabled={disabled || !customQuantity}
+                className="cursor-pointer"
               >
                 Set
               </Button>

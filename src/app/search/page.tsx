@@ -7,7 +7,7 @@ import { AdvancedFilters } from '@/components/search/advanced-filters'
 export default function SearchPage() {
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold">Advanced Search</h1>

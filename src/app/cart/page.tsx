@@ -96,7 +96,7 @@ export default function CartPage() {
   if (!isAuthenticated) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold mb-2">Please Login</h1>
@@ -115,7 +115,7 @@ export default function CartPage() {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="space-y-6">
             <Skeleton className="h-8 w-48" />
             <div className="space-y-4">
@@ -143,7 +143,7 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold mb-2">Your Cart is Empty</h1>
@@ -164,7 +164,7 @@ export default function CartPage() {
 
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-4">

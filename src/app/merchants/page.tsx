@@ -100,7 +100,7 @@ export default function MerchantsPage() {
   if (error) {
     return (
       <MainLayout>
-        <div className="container py-8 px-6 sm:px-8 lg:px-14">
+        <div className="container mx-auto py-8 px-6 sm:px-8 lg:px-14">
           <div className="text-center">
             <Store className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h2 className="text-2xl font-bold mb-2">Error Loading Merchants</h2>
@@ -114,7 +114,7 @@ export default function MerchantsPage() {
 
   return (
     <MainLayout>
-      <div className="container py-8 px-6 sm:px-8 lg:px-14">
+      <div className="py-8 px-6 sm:px-8 lg:px-14">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Find Merchants</h1>
@@ -125,8 +125,8 @@ export default function MerchantsPage() {
 
         {/* Search and Filters */}
         <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="flex flex-col lg:flex-row gap-4">
+          <CardContent className="px-2 md:px-6">
+            <div className="flex flex-col sm:flex-row gap-4">
               {/* Search */}
               <div className="flex-1">
                 <div className="relative">
@@ -141,9 +141,9 @@ export default function MerchantsPage() {
               </div>
 
               {/* Filters */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5 ">
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="max-w-[180px]">
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -160,7 +160,7 @@ export default function MerchantsPage() {
                 </Select>
 
                 <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="max-w-[180px]">
                     <SelectValue placeholder="Region" />
                   </SelectTrigger>
                   <SelectContent>
@@ -179,7 +179,7 @@ export default function MerchantsPage() {
                 </Select>
 
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="max-w-[180px]">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
@@ -190,7 +190,7 @@ export default function MerchantsPage() {
                   </SelectContent>
                 </Select>
 
-                <div className="flex border rounded-md">
+                {/* <div className="flex border rounded-md">
                   <Button
                     variant={viewMode === 'grid' ? 'default' : 'ghost'}
                     size="sm"
@@ -207,7 +207,7 @@ export default function MerchantsPage() {
                   >
                     <List className="h-4 w-4" />
                   </Button>
-                </div>
+                </div> */}
               </div>
             </div>
           </CardContent>
@@ -216,9 +216,9 @@ export default function MerchantsPage() {
         {/* Results */}
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <p className="text-sm text-muted-foreground">
+            {/* <p className="text-sm text-muted-foreground">
               {isLoading ? 'Loading...' : `${sortedMerchants.length} merchants found`}
-            </p>
+            </p> */}
             {userLocation && (
               <Badge variant="outline" className="text-xs">
                 <MapPin className="h-3 w-3 mr-1" />

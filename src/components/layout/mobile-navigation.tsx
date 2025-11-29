@@ -15,21 +15,15 @@ import {
   User, 
   MessageSquare, 
   Bell,
-  Store,
-  Settings,
-  LogOut,
-  Search,
-  Heart,
-  MapPin,
-  CreditCard,
   Truck,
-  Star,
-  HelpCircle
+  Store,
+  Settings
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
 import { useNotifications } from '@/hooks/useNotifications'
 import { cn } from '@/lib/utils'
+import { QuickActions } from './quick-actions'
 
 interface MobileNavigationProps {
   className?: string
@@ -94,7 +88,7 @@ export function MobileNavigation({ className }: MobileNavigationProps) {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="sm" className={cn('md:hidden', className)}>
+        <Button variant="ghost" size="sm" className={cn('cursor-pointer', className)}>
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
@@ -106,13 +100,14 @@ export function MobileNavigation({ className }: MobileNavigationProps) {
               <SheetTitle className="text-lg font-semibold">
                 {isAdmin ? 'Admin Panel' : isMerchant ? 'Merchant Portal' : 'E-commerce'}
               </SheetTitle>
-              <Button
+              {/* <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsOpen(false)}
+                className='cursor-pointer'
               >
                 <X className="h-4 w-4" />
-              </Button>
+              </Button> */}
             </div>
           </SheetHeader>
 
@@ -148,7 +143,7 @@ export function MobileNavigation({ className }: MobileNavigationProps) {
                     key={item.name}
                     variant={isActive ? 'default' : 'ghost'}
                     className={cn(
-                      'w-full justify-start h-12',
+                      'w-full justify-start h-12 cursor-pointer',
                       isActive && 'bg-primary text-primary-foreground'
                     )}
                     onClick={() => handleNavClick(item.href)}
@@ -168,72 +163,14 @@ export function MobileNavigation({ className }: MobileNavigationProps) {
             <Separator className="my-4" />
 
             {/* Quick Actions */}
-            <div className="p-4 space-y-2">
-              <h3 className="text-sm font-medium text-muted-foreground mb-3">
-                Quick Actions
-              </h3>
-              
-              {/* Search - Available in mobile menu */}
-              <Button
-                variant="outline"
-                className="w-full justify-start h-12"
-                onClick={() => handleNavClick('/products')}
-              >
-                <Search className="h-5 w-5 mr-3" />
-                <span>Search</span>
-              </Button>
-              
-              {!isAuthenticated ? (
-                <div className="space-y-2">
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start h-12"
-                    onClick={() => handleNavClick('/login')}
-                  >
-                    <User className="h-5 w-5 mr-3" />
-                    <span>Login</span>
-                  </Button>
-                  <Button
-                    className="w-full justify-start h-12"
-                    onClick={() => handleNavClick('/signup')}
-                  >
-                    <User className="h-5 w-5 mr-3" />
-                    <span>Sign Up</span>
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start h-12"
-                    onClick={() => handleNavClick('/profile')}
-                  >
-                    <Settings className="h-5 w-5 mr-3" />
-                    <span>Account Settings</span>
-                  </Button>
-                  
-                  {!isMerchant && !isAdmin && (
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start h-12"
-                      onClick={() => handleNavClick('/merchant/register')}
-                    >
-                      <Store className="h-5 w-5 mr-3" />
-                      <span>Become a Merchant</span>
-                    </Button>
-                  )}
-                  
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start h-12 text-red-600 hover:text-red-700"
-                    onClick={handleLogout}
-                  >
-                    <LogOut className="h-5 w-5 mr-3" />
-                    <span>Logout</span>
-                  </Button>
-                </>
-              )}
-            </div>
+            <QuickActions
+              isAuthenticated={isAuthenticated}
+              isMerchant={isMerchant}
+              isAdmin={isAdmin}
+              onNavClick={handleNavClick}
+              onLogout={handleLogout}
+              variant="mobile"
+            />
           </div>
 
           {/* Footer */}

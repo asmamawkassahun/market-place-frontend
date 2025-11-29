@@ -175,7 +175,7 @@ export default function ProductsPage() {
 
   return (
     <MainLayout>
-      <div className="container py-8 px-6 sm:px-8 lg:px-14">
+      <div className="container mx-auto py-8 px-6 sm:px-8 lg:px-14">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Products</h1>
@@ -197,10 +197,11 @@ export default function ProductsPage() {
                 className="pl-10"
               />
             </div>
-            <Button type="submit">Search</Button>
+            {/* <Button className='cursor-pointer' type="submit">Search</Button> */}
             <Button
               type="button"
               variant="outline"
+              className='cursor-pointer'
               onClick={() => setShowFilters(!showFilters)}
             >
               <SlidersHorizontal className="h-4 w-4 mr-2" />
@@ -271,7 +272,7 @@ export default function ProductsPage() {
                 </div>
 
                 {/* Filter Actions */}
-                <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                {/* <div className="flex items-center justify-between mt-4 pt-4 border-t">
                   <div className="flex items-center space-x-2">
                     {hasActiveFilters && (
                       <Badge variant="secondary" className="cursor-pointer" onClick={clearFilters}>
@@ -284,15 +285,15 @@ export default function ProductsPage() {
                       </span>
                     )}
                   </div>
-                </div>
+                </div> */}
               </CardContent>
             </Card>
           )}
         </div>
 
         {/* Results Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-4">
+        {/* <div className="flex items-center justify-between mb-6"> */}
+          {/* <div className="flex items-center space-x-4">
             <span className="text-sm text-muted-foreground">
               {isLoading ? 'Loading...' : `${filteredProducts.length} products found`}
             </span>
@@ -301,9 +302,9 @@ export default function ProductsPage() {
                 Clear all filters
               </Badge>
             )}
-          </div>
+          </div> */}
 
-          <div className="flex items-center space-x-2">
+          {/* <div className="flex items-center space-x-2">
             <Button
               variant={viewMode === 'grid' ? 'default' : 'outline'}
               size="sm"
@@ -318,8 +319,8 @@ export default function ProductsPage() {
             >
               <List className="h-4 w-4" />
             </Button>
-          </div>
-        </div>
+          </div> */}
+        {/* </div> */}
 
         {/* Products Grid/List */}
         {isLoading ? (
@@ -346,13 +347,6 @@ export default function ProductsPage() {
           <div className="text-center py-12">
             <p className="text-destructive mb-4">{error}</p>
             <Button onClick={() => loadProducts()}>Try Again</Button>
-          </div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground mb-4">No products found</p>
-            {hasActiveFilters && (
-              <Button onClick={clearFilters}>Clear Filters</Button>
-            )}
           </div>
         ) : (
             <div className={cn(

@@ -137,7 +137,7 @@ export default function LoyaltyPage() {
   if (!isAuthenticated) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <Gift className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold mb-2">Please Login</h1>
@@ -159,7 +159,7 @@ export default function LoyaltyPage() {
 
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         {/* Header */}
         <div className="flex items-center space-x-4 mb-8">
           <Link href="/profile">

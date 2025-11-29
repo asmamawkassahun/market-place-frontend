@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
 import { useChat } from '@/hooks/useChat'
 import { useNotifications } from '@/hooks/useNotifications'
 import { MobileNavigation } from './mobile-navigation'
+import { QuickActions } from './quick-actions'
 import { NotificationDropdown } from '@/components/notifications/notification-center'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -48,6 +49,7 @@ import { cn } from '@/lib/utils'
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
   const { user, isAuthenticated, logout, isUser, isMerchant, isAdmin } = useAuth()
   const { totalItems } = useCart()
   const { unreadCount } = useChat()
@@ -119,97 +121,114 @@ export function Navigation() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 sm:px-8 lg:px-14 flex h-16 items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2 ">
-          <Image
-            src="/logo.svg"
-            alt="MAJET"
-            width={34}
-            height={8}
-            className="h-10 w-full"
-          />
-          {/* <span className="text-xl font-bold">Ethiopian E-commerce</span> */}
-        </Link>
+      <div className=" px-4 md:px-6 lg:px-8 xl:px-14 w-full">
+        <div className="flex h-16 w-full items-center justify-between gap-2 lg:gap-4">
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
+            <Image
+              src="/logo.svg"
+              alt="MAJET"
+              width={34}
+              height={8}
+              className="h-8 lg:h-10 w-full"
+            />
+          </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
-          {getNavItems().map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={cn(
-                "text-sm font-medium transition-colors hover:text-primary",
-                pathname === item.href ? "text-primary" : "text-muted-foreground"
-              )}
-            >
-              {item.name}
-            </Link>
-          ))}
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center flex-1 justify-between px-12  ">
+            {/* Main Navigation Links */}
+            <div className="flex items-center gap-2 lg:gap-4 xl:gap-6 flex-shrink-0">
+              {getNavItems().map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-primary whitespace-nowrap",
+                    pathname === item.href ? "text-primary" : "text-muted-foreground"
+                  )}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
 
-          {/* Additional navigation items for customers */}
-          {isCustomerRoute && isAuthenticated && (
-            <>
-              <Link href="/orders">
-                <Button variant="ghost" size="sm" className="text-sm">
-                  <Truck className="h-4 w-4 mr-2" />
-                  Orders
-                </Button>
-              </Link>
-              <Link href="/wishlist">
-                <Button variant="ghost" size="sm" className="text-sm">
-                  <Heart className="h-4 w-4 mr-2" />
-                  Wishlist
-                </Button>
-              </Link>
-              <Link href="/help">
-                <Button variant="ghost" size="sm" className="text-sm">
-                  <HelpCircle className="h-4 w-4 mr-2" />
-                  Help
-                </Button>
-              </Link>
-            </>
-          )}
+            {/* Quick Actions - Only show when not authenticated */}
+            {!isAuthenticated && (
+              <div className="flex items-center flex-1 max-w-md">
+                <QuickActions
+                  isAuthenticated={isAuthenticated}
+                  isMerchant={isMerchant}
+                  isAdmin={isAdmin}
+                  onNavClick={(href) => router.push(href)}
+                  onLogout={handleLogout}
+                  variant="desktop"
+                />
+              </div>
+            )}
 
-          {/* Additional navigation items for merchants */}
-          {isMerchantRoute && isAuthenticated && isMerchant && (
-            <>
-              <Link href="/merchant/analytics">
-                <Button variant="ghost" size="sm" className="text-sm">
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Analytics
-                </Button>
-              </Link>
-              <Link href="/merchant/settings">
-                <Button variant="ghost" size="sm" className="text-sm">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
-                </Button>
-              </Link>
-            </>
-          )}
+            {/* Additional navigation items for customers */}
+            {isCustomerRoute && isAuthenticated && (
+              <div className="flex items-center gap-2 lg:gap-4 flex-shrink-0">
+                <Link href="/orders">
+                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
+                    <Truck className="h-4 w-4 mr-2" />
+                    <span className="hidden lg:inline">Orders</span>
+                  </Button>
+                </Link>
+                <Link href="/wishlist">
+                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
+                    <Heart className="h-4 w-4 mr-2" />
+                    <span className="hidden lg:inline">Wishlist</span>
+                  </Button>
+                </Link>
+                <Link href="/help">
+                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
+                    <HelpCircle className="h-4 w-4 mr-2" />
+                    <span className="hidden lg:inline">Help</span>
+                  </Button>
+                </Link>
+              </div>
+            )}
 
-          {/* Additional navigation items for admins */}
-          {isAdminRoute && isAuthenticated && isAdmin && (
-            <>
-              <Link href="/admin/analytics">
-                <Button variant="ghost" size="sm" className="text-sm">
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Analytics
-                </Button>
-              </Link>
-              <Link href="/admin/system">
-                <Button variant="ghost" size="sm" className="text-sm">
-                  <Shield className="h-4 w-4 mr-2" />
-                  System
-                </Button>
-              </Link>
-            </>
-          )}
-        </nav>
+            {/* Additional navigation items for merchants */}
+            {isMerchantRoute && isAuthenticated && isMerchant && (
+              <div className="flex items-center gap-2 lg:gap-4 flex-shrink-0">
+                <Link href="/merchant/analytics">
+                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    <span className="hidden lg:inline">Analytics</span>
+                  </Button>
+                </Link>
+                <Link href="/merchant/settings">
+                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
+                    <Settings className="h-4 w-4 mr-2" />
+                    <span className="hidden lg:inline">Settings</span>
+                  </Button>
+                </Link>
+              </div>
+            )}
 
-        {/* Right side actions */}
-        <div className="flex items-center space-x-4">
+            {/* Additional navigation items for admins */}
+            {isAdminRoute && isAuthenticated && isAdmin && (
+              <div className="flex items-center gap-2 lg:gap-4 flex-shrink-0">
+                <Link href="/admin/analytics">
+                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    <span className="hidden lg:inline">Analytics</span>
+                  </Button>
+                </Link>
+                <Link href="/admin/system">
+                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
+                    <Shield className="h-4 w-4 mr-2" />
+                    <span className="hidden lg:inline">System</span>
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </nav>
+
+          {/* Right side actions */}
+          <div className="hidden lg:flex items-center gap-2 lg:gap-4 flex-shrink-0">
           {/* Search - Hidden from navbar, available in mobile menu */}
           <Button variant="ghost" size="icon" className="hidden">
             <Search className="h-4 w-4" />
@@ -310,19 +329,22 @@ export function Navigation() {
           ) : (
             <div className="hidden items-center space-x-2">
               <Link href="/login">
-                <Button variant="ghost">Login</Button>
+                <Button variant="ghost" className='cursor-pointer'>Login</Button>
               </Link>
               <Link href="/signup">
-                <Button>Sign Up</Button>
+                <Button className='cursor-pointer'>Sign Up</Button>
               </Link>
             </div>
           )}
 
-          {/* Mobile Menu */}
-          <MobileNavigation />
+          </div>
+
+          {/* Mobile Menu - Visible on small and medium screens only */}
+          <div className="flex items-center lg:hidden">
+            <MobileNavigation />
+          </div>
         </div>
       </div>
-
     </header>
   )
 }

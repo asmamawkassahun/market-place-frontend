@@ -218,7 +218,7 @@ export default function MerchantRegisterPage() {
   if (authLoading) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <Loader2 className="h-16 w-16 mx-auto text-muted-foreground mb-4 animate-spin" />
             <h1 className="text-2xl font-bold mb-2">Loading...</h1>
@@ -234,7 +234,7 @@ export default function MerchantRegisterPage() {
   if (!isAuthenticated) {
     return (
       <MainLayout>
-        <div className="container py-8">
+        <div className="container mx-auto py-8">
           <div className="text-center">
             <Store className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold mb-2">Please Login</h1>
@@ -252,7 +252,7 @@ export default function MerchantRegisterPage() {
 
   return (
     <MainLayout>
-      <div className="container py-8">
+      <div className="container mx-auto py-8">
         {/* Header */}
         <div className="flex items-center space-x-4 mb-8">
           <Link href="/">

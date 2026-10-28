@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Heart, ShoppingCart, Star, MapPin } from 'lucide-react'
+import { Heart, ShoppingCart, Star, MapPin, Check } from 'lucide-react'
 import { Product, Sku, UnitType } from '@/types'
 import { formatCurrency, formatUnit, getRatingStars, getStatusColor } from '@/lib/utils'
 import { useCart } from '@/hooks/useCart'
@@ -29,6 +29,7 @@ export function ProductCard({
   const [selectedSku, setSelectedSku] = useState<Sku | null>(product.skus?.[0] || null)
   const [quantity, setQuantity] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
+  const [isAdded, setIsAdded] = useState(false)
   
   const { addItem } = useCart()
   const { isAuthenticated } = useAuth()
@@ -44,10 +45,12 @@ export function ProductCard({
     setIsLoading(true)
     try {
       if (onAddToCart) {
-        onAddToCart(selectedSku.id, quantity)
+        await onAddToCart(selectedSku.id, quantity)
       } else {
         await addItem(selectedSku.id, quantity)
       }
+      setIsAdded(true)
+      setTimeout(() => setIsAdded(false), 2000)
     } finally {
       setIsLoading(false)
     }
@@ -238,14 +241,19 @@ export function ProductCard({
         <Button
           onClick={handleAddToCart}
           disabled={!selectedSku || isLoading}
-          className="w-full cursor-pointer"
+          variant={isAdded ? "secondary" : "default"}
+          className={`w-full cursor-pointer transition-colors ${
+            isAdded ? "bg-green-50 text-green-700 border border-green-300 hover:bg-green-100" : ""
+          }`}
         >
           {isLoading ? (
             <Skeleton className="h-4 w-4 mr-2" />
+          ) : isAdded ? (
+            <Check className="h-4 w-4 mr-2 text-green-600" />
           ) : (
             <ShoppingCart className="h-4 w-4 mr-2" />
           )}
-          {!isAuthenticated ? 'Login to Add' : 'Add to Cart'}
+          {!isAuthenticated ? 'Login to Add' : isAdded ? 'Added to Cart!' : 'Add to Cart'}
         </Button>
       </CardFooter>
     </Card>

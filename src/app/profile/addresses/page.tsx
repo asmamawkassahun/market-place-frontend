@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { Address } from '@/types'
+import { addressesService } from '@/services/addresses'
 import { formatDate } from '@/lib/utils'
 import Link from 'next/link'
 
@@ -65,44 +66,64 @@ export default function AddressesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [editingAddress, setEditingAddress] = useState<Address | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const { isAuthenticated } = useAuth()
 
+  const loadAddresses = async () => {
+    setIsLoading(true)
+    try {
+      const data = await addressesService.getAddresses()
+      setAddresses(Array.isArray(data) ? data : [])
+    } catch (err) {
+      console.error('Failed to load addresses:', err)
+      setAddresses([])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   useEffect(() => {
     if (isAuthenticated) {
-      // Simulate API call
-      setTimeout(() => {
-        setAddresses(mockAddresses)
-        setIsLoading(false)
-      }, 1000)
+      loadAddresses()
     }
   }, [isAuthenticated])
 
-  const handleAddAddress = (data: any) => {
-    const newAddress: Address = {
-      id: Date.now().toString(),
-      userId: 'user1',
-      ...data,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+  const handleAddAddress = async (data: any) => {
+    setIsSubmitting(true)
+    try {
+      const created = await addressesService.createAddress(data)
+      setAddresses(prev => [created, ...prev])
+      setIsDialogOpen(false)
+    } catch (err) {
+      console.error('Failed to create address:', err)
+    } finally {
+      setIsSubmitting(false)
     }
-    setAddresses(prev => [...prev, newAddress])
-    setIsDialogOpen(false)
   }
 
-  const handleEditAddress = (data: any) => {
-    if (editingAddress) {
-      setAddresses(prev => prev.map(addr => 
-        addr.id === editingAddress.id 
-          ? { ...addr, ...data, updatedAt: new Date().toISOString() }
-          : addr
-      ))
+  const handleEditAddress = async (data: any) => {
+    if (!editingAddress) return
+    setIsSubmitting(true)
+    try {
+      const updated = await addressesService.updateAddress(editingAddress.id, data)
+      setAddresses(prev => prev.map(addr => addr.id === editingAddress.id ? updated : addr))
+      setIsDialogOpen(false)
       setEditingAddress(null)
+    } catch (err) {
+      console.error('Failed to update address:', err)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
-  const handleDeleteAddress = (addressId: string) => {
-    setAddresses(prev => prev.filter(addr => addr.id !== addressId))
+  const handleDeleteAddress = async (addressId: string) => {
+    try {
+      await addressesService.deleteAddress(addressId)
+      setAddresses(prev => prev.filter(addr => addr.id !== addressId))
+    } catch (err) {
+      console.error('Failed to delete address:', err)
+    }
   }
 
   const openEditDialog = (address: Address) => {
@@ -118,8 +139,8 @@ export default function AddressesPage() {
   if (!isAuthenticated) {
     return (
       <MainLayout>
-        <div className="container mx-auto py-8">
-          <div className="text-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center max-w-md mx-auto">
             <MapPin className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold mb-2">Please Login</h1>
             <p className="text-muted-foreground mb-6">
@@ -136,7 +157,7 @@ export default function AddressesPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
         <div className="flex items-center space-x-4 mb-8">
           <Link href="/profile">

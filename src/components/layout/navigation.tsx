@@ -51,8 +51,8 @@ export function Navigation() {
   const { unreadCount: notificationCount } = useNotifications()
   const [searchKeyword, setSearchKeyword] = useState('')
 
-  const isMerchantRoute = pathname.startsWith('/merchant')
-  const isAdminRoute = pathname.startsWith('/admin')
+  const isMerchantRoute = pathname === '/merchant' || pathname.startsWith('/merchant/')
+  const isAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/')
   const isCustomerRoute = !isMerchantRoute && !isAdminRoute
 
   const customerNavItems = [
@@ -185,8 +185,8 @@ export function Navigation() {
 
           {/* Right Side Actions */}
           <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
-            {/* Quick Add Product Button for Merchants */}
-            {isMerchantRoute && (
+            {/* Quick Add Product Button strictly for Merchants inside Merchant Portal */}
+            {isMerchantRoute && isMerchant && (
               <Button size="sm" asChild className="h-8.5 gap-1.5 text-xs font-semibold shadow-xs">
                 <Link href="/merchant/products/new">
                   <Plus className="h-3.5 w-3.5" />
@@ -332,7 +332,7 @@ export function Navigation() {
                 </Button>
               </Link>
             )}
-            {isMerchantRoute && (
+            {isMerchantRoute && isMerchant && (
               <Button size="sm" variant="outline" asChild className="h-8 px-2.5 text-xs gap-1 border-primary/30 text-primary">
                 <Link href="/merchant/products/new">
                   <Plus className="h-3.5 w-3.5" />

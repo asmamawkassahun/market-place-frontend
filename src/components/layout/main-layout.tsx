@@ -27,8 +27,8 @@ export function MainLayout({ children }: MainLayoutProps) {
   const { isAuthenticated, isMerchant, isAdmin } = useAuth()
   const { currentMerchant, loadMerchantById } = useMerchants()
   
-  const isMerchantRoute = pathname.startsWith('/merchant')
-  const isAdminRoute = pathname.startsWith('/admin')
+  const isMerchantRoute = pathname === '/merchant' || pathname.startsWith('/merchant/')
+  const isAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/')
   const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/register')
   const isCustomerRoute = !isMerchantRoute && !isAdminRoute && !isAuthRoute
   

@@ -103,8 +103,8 @@ export default function MerchantDetailPage() {
   if (merchantError) {
     return (
       <MainLayout>
-        <div className="container mx-auto py-8">
-          <div className="text-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center max-w-md mx-auto">
             <Store className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h2 className="text-2xl font-bold mb-2">Merchant Not Found</h2>
             <p className="text-muted-foreground mb-6">{merchantError}</p>
@@ -121,10 +121,10 @@ export default function MerchantDetailPage() {
   if (merchantLoading) {
     return (
       <MainLayout>
-        <div className="container mx-auto py-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin" />
-            <span className="ml-2">Loading merchant...</span>
+            <span className="ml-2 text-muted-foreground">Loading merchant details...</span>
           </div>
         </div>
       </MainLayout>
@@ -134,12 +134,12 @@ export default function MerchantDetailPage() {
   if (!merchant) {
     return (
       <MainLayout>
-        <div className="container mx-auto py-8">
-          <div className="text-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center max-w-md mx-auto">
             <Store className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h2 className="text-2xl font-bold mb-2">Merchant Not Found</h2>
             <p className="text-muted-foreground mb-6">
-              The merchant you're looking for doesn't exist or has been removed.
+              The merchant you&apos;re looking for doesn&apos;t exist or has been removed.
             </p>
             <Button onClick={() => router.back()} className='cursor-pointer'>
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -155,7 +155,7 @@ export default function MerchantDetailPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Back Button */}
         <Button 
           variant="ghost" 

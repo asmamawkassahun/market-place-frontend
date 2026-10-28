@@ -175,10 +175,12 @@ export function OrderCard({
             </Link>
             
             {/* Chat with Merchant */}
-            <Button variant="outline" size="sm">
-              <MessageCircle className="h-4 w-4 mr-2" />
-              Chat
-            </Button>
+            <Link href={`/chat?merchantId=${order.merchantId}`}>
+              <Button variant="outline" size="sm">
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Chat
+              </Button>
+            </Link>
           </div>
         )}
       </CardContent>

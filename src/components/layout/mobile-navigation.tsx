@@ -219,6 +219,35 @@ export function MobileNavigation({ className }: MobileNavigationProps) {
           {/* Customer Extra Links */}
           {!isMerchant && !isAdmin && (
             <div className="space-y-1">
+              {isAuthenticated && (
+                <>
+                  <Button
+                    variant={pathname === '/orders' ? 'default' : 'ghost'}
+                    className="w-full justify-start h-10 text-sm font-medium cursor-pointer"
+                    onClick={() => handleNavClick('/orders')}
+                  >
+                    <Truck className="h-4 w-4 mr-3" />
+                    <span>My Orders</span>
+                  </Button>
+                  <Button
+                    variant={pathname === '/wishlist' ? 'default' : 'ghost'}
+                    className="w-full justify-start h-10 text-sm font-medium cursor-pointer"
+                    onClick={() => handleNavClick('/wishlist')}
+                  >
+                    <Heart className="h-4 w-4 mr-3" />
+                    <span>My Wishlist</span>
+                  </Button>
+                  <Button
+                    variant={pathname === '/profile' ? 'default' : 'ghost'}
+                    className="w-full justify-start h-10 text-sm font-medium cursor-pointer"
+                    onClick={() => handleNavClick('/profile')}
+                  >
+                    <User className="h-4 w-4 mr-3" />
+                    <span>Account Profile</span>
+                  </Button>
+                  <Separator className="my-2" />
+                </>
+              )}
               <Button
                 variant="ghost"
                 className="w-full justify-start h-10 text-sm font-medium text-primary hover:bg-primary/10 cursor-pointer"
@@ -230,7 +259,7 @@ export function MobileNavigation({ className }: MobileNavigationProps) {
               <Button
                 variant="ghost"
                 className="w-full justify-start h-10 text-sm font-medium text-muted-foreground cursor-pointer"
-                onClick={() => handleNavClick('/help')}
+                onClick={() => handleNavClick('/faq')}
               >
                 <HelpCircle className="h-4 w-4 mr-3" />
                 Help & FAQ

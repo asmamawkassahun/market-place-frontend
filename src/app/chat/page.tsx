@@ -51,7 +51,7 @@ function ChatContent() {
   if (!isAuthenticated) {
     return (
       <MainLayout>
-        <div className="container mx-auto py-8 text-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center max-w-md mx-auto">
           <MessageCircle className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
           <h1 className="text-2xl font-bold mb-2">Please Login</h1>
           <p className="text-muted-foreground mb-6">You need to be logged in to access chat</p>
@@ -65,7 +65,7 @@ function ChatContent() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Messages</h1>
           <p className="text-muted-foreground">Chat with merchants about your orders</p>

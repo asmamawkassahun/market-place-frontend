@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import { MainLayout } from '@/components/layout/main-layout'
 import { ProductCard } from '@/components/products/product-card'
 import { Button } from '@/components/ui/button'
@@ -10,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Search, Filter, Grid, List, SlidersHorizontal } from 'lucide-react'
+import { Search, Filter, Grid, List, SlidersHorizontal, X, Package, RotateCcw } from 'lucide-react'
 import { useProducts } from '@/hooks/useProducts'
 import { UnitType } from '@/types'
 import { cn } from '@/lib/utils'
@@ -34,27 +35,21 @@ function ProductsContent() {
     categories,
     isLoading,
     error,
-    pagination,
     loadProducts,
-    setSearchQuery: setSearchQueryAction,
-    setFilters,
-    setPagination
+    setFilters
   } = useProducts()
 
   // Load all products on mount
   useEffect(() => {
     loadProducts({
       page: 1,
-      limit: 1000 // Load a large batch for frontend filtering
+      limit: 1000
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [loadProducts])
 
   // Store all products when they're loaded
   useEffect(() => {
     if (products.length > 0) {
-      // Replace all products with the loaded batch
-      // Since we're loading with limit 1000, this should get most/all products
       setAllProducts(products)
     }
   }, [products])
@@ -66,7 +61,6 @@ function ProductsContent() {
       allProducts.forEach(product => {
         product.skus?.forEach((sku: any) => {
           if (sku.active && sku.pricePerCanonicalUnit) {
-            // Convert from cents to ETB
             const priceInETB = sku.pricePerCanonicalUnit / 100
             allPrices.push(priceInETB)
           }
@@ -118,7 +112,6 @@ function ProductsContent() {
       const min = minPrice ? parseFloat(minPrice) : 0
       const max = maxPrice ? parseFloat(maxPrice) : Infinity
       
-      // Only filter if values are valid numbers
       if (!isNaN(min) && !isNaN(max)) {
         filtered = filtered.filter(product => {
           return product.skus?.some((sku: any) => {
@@ -135,7 +128,6 @@ function ProductsContent() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    // Frontend filtering, no need to reload
   }
 
   const clearFilters = () => {
@@ -143,7 +135,6 @@ function ProductsContent() {
     setSelectedCategory('all')
     setSelectedMerchant('')
     setSelectedUnitType('all')
-    // Recalculate price range when clearing filters
     if (allProducts.length > 0) {
       const allPrices: number[] = []
       allProducts.forEach(product => {
@@ -165,60 +156,71 @@ function ProductsContent() {
         setMaxPrice('')
       }
     } else {
-    setMinPrice('')
-    setMaxPrice('')
+      setMinPrice('')
+      setMaxPrice('')
     }
     setFilters({})
   }
 
-  const hasActiveFilters = searchQuery || selectedCategory !== 'all' || selectedMerchant || selectedUnitType !== 'all' || minPrice || maxPrice
+  const hasActiveFilters = Boolean(searchQuery || (selectedCategory !== 'all') || selectedMerchant || (selectedUnitType !== 'all'))
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8 px-6 sm:px-8 lg:px-14">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Products</h1>
-          <p className="text-muted-foreground">
-            Discover products from local merchants across Ethiopia
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">Marketplace Products</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Explore authentic items, grains, spices, coffee, and crafts from verified Ethiopian merchants.
           </p>
         </div>
 
-        {/* Search and Filters */}
-        <div className="mb-8 space-y-4">
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="flex items-center space-x-4">
+        {/* Search and Filters Bar */}
+        <div className="mb-6 space-y-4">
+          <form onSubmit={handleSearch} className="flex items-center gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search products..."
+                placeholder="Search products, teff, buna, shiro, textiles..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 h-10 rounded-lg text-sm"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
-            {/* <Button className='cursor-pointer' type="submit">Search</Button> */}
+
             <Button
               type="button"
-              variant="outline"
-              className='cursor-pointer'
+              variant={showFilters ? "default" : "outline"}
+              className="h-10 cursor-pointer gap-2"
               onClick={() => setShowFilters(!showFilters)}
             >
-              <SlidersHorizontal className="h-4 w-4 mr-2" />
-              Filters
+              <SlidersHorizontal className="h-4 w-4" />
+              <span>Filters</span>
+              {hasActiveFilters && (
+                <span className="w-2 h-2 rounded-full bg-primary-foreground" />
+              )}
             </Button>
           </form>
 
           {/* Filters Panel */}
           {showFilters && (
-            <Card>
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="border-border/80 shadow-xs">
+              <CardContent className="p-4 sm:p-6 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {/* Category Filter */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Category</label>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground">Category</label>
                     <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-9">
                         <SelectValue placeholder="All Categories" />
                       </SelectTrigger>
                       <SelectContent>
@@ -233,136 +235,157 @@ function ProductsContent() {
                   </div>
 
                   {/* Unit Type Filter */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Unit Type</label>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground">Unit Measurement</label>
                     <Select value={selectedUnitType} onValueChange={(value) => setSelectedUnitType(value as UnitType | 'all')}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-9">
                         <SelectValue placeholder="All Units" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Units</SelectItem>
-                        <SelectItem value="PIECE">Piece</SelectItem>
-                        <SelectItem value="KG">Kilogram</SelectItem>
-                        <SelectItem value="LITER">Liter</SelectItem>
-                        <SelectItem value="METER">Meter</SelectItem>
+                        <SelectItem value="PIECE">Piece (Piece items)</SelectItem>
+                        <SelectItem value="KG">Kilogram (KG - Teff, Grains, Buna)</SelectItem>
+                        <SelectItem value="LITER">Liter (L - Honey, Oil)</SelectItem>
+                        <SelectItem value="METER">Meter (M - Fabrics, Shema)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   {/* Price Range */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Min Price (ETB)</label>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground">Min Price (ETB)</label>
                     <Input
                       type="number"
                       placeholder="0"
                       value={minPrice}
                       onChange={(e) => setMinPrice(e.target.value)}
+                      className="h-9"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Max Price (ETB)</label>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-muted-foreground">Max Price (ETB)</label>
                     <Input
                       type="number"
-                      placeholder="1000"
+                      placeholder="5000"
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(e.target.value)}
+                      className="h-9"
                     />
                   </div>
                 </div>
 
-                {/* Filter Actions */}
-                {/* <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                  <div className="flex items-center space-x-2">
-                    {hasActiveFilters && (
-                      <Badge variant="secondary" className="cursor-pointer" onClick={clearFilters}>
-                        Clear Filters
-                      </Badge>
-                    )}
-                    {hasActiveFilters && (
-                      <span className="text-sm text-muted-foreground">
-                        {filteredProducts.length} products found
-                      </span>
-                    )}
+                {hasActiveFilters && (
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <span className="text-xs text-muted-foreground">
+                      Filters applied
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearFilters}
+                      className="h-7 text-xs text-primary gap-1"
+                    >
+                      <RotateCcw className="h-3 w-3" />
+                      Reset Filters
+                    </Button>
                   </div>
-                </div> */}
+                )}
               </CardContent>
             </Card>
           )}
         </div>
 
         {/* Results Header */}
-        {/* <div className="flex items-center justify-between mb-6"> */}
-          {/* <div className="flex items-center space-x-4">
-            <span className="text-sm text-muted-foreground">
-              {isLoading ? 'Loading...' : `${filteredProducts.length} products found`}
+        <div className="flex items-center justify-between mb-6 pb-2 border-b">
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <span>
+              {isLoading ? 'Loading products...' : `${filteredProducts.length} ${filteredProducts.length === 1 ? 'product' : 'products'} found`}
             </span>
             {hasActiveFilters && (
-              <Badge variant="outline" onClick={clearFilters} className="cursor-pointer">
-                Clear all filters
+              <Badge
+                variant="secondary"
+                onClick={clearFilters}
+                className="cursor-pointer text-xs hover:bg-muted ml-2"
+              >
+                Clear filters <X className="h-3 w-3 ml-1" />
               </Badge>
             )}
-          </div> */}
+          </div>
 
-          {/* <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1.5">
             <Button
-              variant={viewMode === 'grid' ? 'default' : 'outline'}
+              variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
               size="sm"
+              className="h-8 w-8 p-0 cursor-pointer"
               onClick={() => setViewMode('grid')}
+              title="Grid View"
             >
               <Grid className="h-4 w-4" />
             </Button>
             <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
+              variant={viewMode === 'list' ? 'secondary' : 'ghost'}
               size="sm"
+              className="h-8 w-8 p-0 cursor-pointer"
               onClick={() => setViewMode('list')}
+              title="List View"
             >
               <List className="h-4 w-4" />
             </Button>
-          </div> */}
-        {/* </div> */}
+          </div>
+        </div>
 
-        {/* Products Grid/List */}
+        {/* Products Grid / List */}
         {isLoading ? (
           <div className={cn(
             "grid gap-6",
             viewMode === 'grid' 
-              ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
               : "grid-cols-1"
           )}>
             {Array.from({ length: 8 }).map((_, i) => (
-              <Card key={i}>
-                <CardContent className="p-0">
-                  <Skeleton className="aspect-square rounded-t-lg" />
-                  <div className="p-4 space-y-2">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                    <Skeleton className="h-6 w-1/3" />
-                  </div>
-                </CardContent>
+              <Card key={i} className="overflow-hidden">
+                <Skeleton className="aspect-square w-full" />
+                <div className="p-4 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-6 w-1/3" />
+                </div>
               </Card>
             ))}
           </div>
         ) : error ? (
-          <div className="text-center py-12">
-            <p className="text-destructive mb-4">{error}</p>
+          <div className="text-center py-16">
+            <p className="text-destructive mb-4 font-medium">{error}</p>
             <Button onClick={() => loadProducts()}>Try Again</Button>
           </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="text-center py-16 border rounded-xl bg-muted/20 max-w-lg mx-auto p-8">
+            <Package className="h-16 w-16 mx-auto text-muted-foreground/40 mb-4" />
+            <h2 className="text-lg font-bold mb-1">No Products Match Your Filter</h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              Try adjusting your search keyword, category, or price range.
+            </p>
+            <Button onClick={clearFilters} variant="outline" className="gap-2">
+              <RotateCcw className="h-4 w-4" />
+              Reset All Filters
+            </Button>
+          </div>
         ) : (
-            <div className={cn(
-              "grid gap-6",
-              viewMode === 'grid' 
-                ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                : "grid-cols-1"
-            )}>
+          <div className={cn(
+            "grid gap-6",
+            viewMode === 'grid' 
+              ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+              : "grid-cols-1"
+          )}>
             {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  className={viewMode === 'list' ? 'flex flex-row' : ''}
-                />
-              ))}
-            </div>
+              <ProductCard
+                key={product.id}
+                product={product}
+                className={viewMode === 'list' ? 'flex flex-row overflow-hidden' : ''}
+              />
+            ))}
+          </div>
         )}
       </div>
     </MainLayout>
@@ -371,7 +394,7 @@ function ProductsContent() {
 
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div className="container mx-auto p-8"><Skeleton className="h-96 w-full" /></div>}>
+    <Suspense fallback={<div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8"><Skeleton className="h-96 w-full" /></div>}>
       <ProductsContent />
     </Suspense>
   )

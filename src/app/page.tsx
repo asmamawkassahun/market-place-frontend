@@ -572,7 +572,7 @@ export default function HomePage() {
         
         {/* Top Announcement Bar */}
         <div className="bg-primary/90 text-primary-foreground text-xs py-2 px-4 text-center font-medium">
-          <div className="container mx-auto flex flex-wrap items-center justify-center gap-2 sm:gap-4">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-center gap-2 sm:gap-4">
             <span className="inline-flex items-center gap-1 font-semibold">
               <Sparkles className="h-3.5 w-3.5 text-yellow-300" />
               Free delivery on orders over 1,500 ETB in Addis Ababa

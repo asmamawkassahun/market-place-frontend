@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { MainLayout } from '@/components/layout/main-layout'
 import { OrderCard } from '@/components/orders/order-card'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
@@ -11,7 +13,8 @@ import {
   Package, 
   Filter, 
   Search,
-  Plus
+  Plus,
+  ArrowRight
 } from 'lucide-react'
 import { useOrders } from '@/hooks/useOrders'
 import { useAuth } from '@/hooks/useAuth'
@@ -55,13 +58,16 @@ export default function OrdersPage() {
   if (!isAuthenticated) {
     return (
       <MainLayout>
-        <div className="container mx-auto py-8">
-          <div className="text-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center max-w-md mx-auto">
             <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h1 className="text-2xl font-bold mb-2">Please Login</h1>
             <p className="text-muted-foreground mb-6">
-              You need to be logged in to view your orders
+              You need to be logged in to view your orders and track shipments.
             </p>
+            <Link href="/login">
+              <Button>Login to Continue</Button>
+            </Link>
           </div>
         </div>
       </MainLayout>
@@ -70,27 +76,27 @@ export default function OrdersPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">My Orders</h1>
-          <p className="text-muted-foreground">
-            Track and manage your orders
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">My Orders</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Track deliveries, verify shipments, and manage escrow releases.
           </p>
         </div>
 
         {/* Filters and Search */}
-        <div className="mb-8 space-y-4">
+        <div className="mb-6 space-y-4">
           {/* Search Bar */}
           <div className="flex items-center space-x-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
                 type="text"
-                placeholder="Search orders..."
+                placeholder="Search by order ID or merchant name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-md"
+                className="pl-10 h-10"
               />
             </div>
           </div>
@@ -103,6 +109,7 @@ export default function OrdersPage() {
                 variant={selectedStatus === filter.value ? "default" : "outline"}
                 size="sm"
                 onClick={() => handleStatusFilter(filter.value)}
+                className="h-8 text-xs font-medium"
               >
                 {filter.label}
               </Button>
@@ -130,25 +137,27 @@ export default function OrdersPage() {
             ))}
           </div>
         ) : error ? (
-          <div className="text-center py-12">
-            <p className="text-destructive mb-4">{error}</p>
+          <div className="text-center py-16">
+            <p className="text-destructive mb-4 font-medium">{error}</p>
             <Button onClick={() => loadOrders()}>Try Again</Button>
           </div>
         ) : filteredOrders.length === 0 ? (
-          <div className="text-center py-12">
-            <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No Orders Found</h2>
-            <p className="text-muted-foreground mb-6">
+          <div className="text-center py-16 border rounded-xl bg-muted/20 max-w-lg mx-auto p-8">
+            <Package className="h-16 w-16 mx-auto text-muted-foreground/40 mb-4" />
+            <h2 className="text-lg font-bold mb-1">No Orders Found</h2>
+            <p className="text-sm text-muted-foreground mb-6">
               {searchQuery || selectedStatus 
-                ? 'No orders match your current filters'
-                : 'You haven\'t placed any orders yet'
+                ? 'No orders match your current filter selections.'
+                : 'You have not placed any orders on the marketplace yet.'
               }
             </p>
             {!searchQuery && !selectedStatus && (
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Start Shopping
-              </Button>
+              <Link href="/products">
+                <Button className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Explore Products
+                </Button>
+              </Link>
             )}
           </div>
         ) : (

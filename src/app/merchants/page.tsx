@@ -100,8 +100,8 @@ export default function MerchantsPage() {
   if (error) {
     return (
       <MainLayout>
-        <div className="container mx-auto py-8 px-6 sm:px-8 lg:px-14">
-          <div className="text-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center max-w-md mx-auto">
             <Store className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
             <h2 className="text-2xl font-bold mb-2">Error Loading Merchants</h2>
             <p className="text-muted-foreground mb-6">{error}</p>
@@ -114,12 +114,12 @@ export default function MerchantsPage() {
 
   return (
     <MainLayout>
-      <div className="py-8 px-6 sm:px-8 lg:px-14">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Find Merchants</h1>
-          <p className="text-muted-foreground">
-            Discover local merchants and businesses in your area
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">Verified Local Merchants</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Connect directly with verified businesses, roasters, farms, and artisan shops across Ethiopia.
           </p>
         </div>
 
@@ -215,10 +215,10 @@ export default function MerchantsPage() {
 
         {/* Results */}
         <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {/* <p className="text-sm text-muted-foreground">
-              {isLoading ? 'Loading...' : `${sortedMerchants.length} merchants found`}
-            </p> */}
+          <div className="flex items-center gap-3">
+            <p className="text-sm text-muted-foreground">
+              {isLoading ? 'Loading merchants...' : `${sortedMerchants.length} ${sortedMerchants.length === 1 ? 'merchant' : 'merchants'} available`}
+            </p>
             {userLocation && (
               <Badge variant="outline" className="text-xs">
                 <MapPin className="h-3 w-3 mr-1" />

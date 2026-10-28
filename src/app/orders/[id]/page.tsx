@@ -42,6 +42,7 @@ export default function OrderDetailPage() {
   
   const [otpCode, setOtpCode] = useState('')
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false)
+  const [isTrackingCopied, setIsTrackingCopied] = useState(false)
 
   const { currentOrder, isLoading, error, loadOrder } = useOrders()
   const { isAuthenticated } = useAuth()
@@ -51,6 +52,26 @@ export default function OrderDetailPage() {
       loadOrder(orderId)
     }
   }, [isAuthenticated, orderId, loadOrder])
+
+  const handleCopyTracking = (code: string) => {
+    if (typeof window !== 'undefined' && code) {
+      navigator.clipboard.writeText(code)
+      setIsTrackingCopied(true)
+      setTimeout(() => setIsTrackingCopied(false), 2000)
+    }
+  }
+
+  const handleChatWithMerchant = () => {
+    if (currentOrder?.merchantId) {
+      router.push(`/chat?merchantId=${currentOrder.merchantId}`)
+    } else {
+      router.push('/chat')
+    }
+  }
+
+  const handlePrintSlip = () => {
+    window.print()
+  }
 
   const handleVerifyOtp = async () => {
     if (!otpCode || !currentOrder?.shipments?.[0]) return
@@ -83,8 +104,8 @@ export default function OrderDetailPage() {
   if (!isAuthenticated) {
     return (
       <MainLayout>
-        <div className="container mx-auto py-8">
-          <div className="text-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center max-w-md mx-auto">
             <h1 className="text-2xl font-bold mb-4">Please Login</h1>
             <p className="text-muted-foreground mb-6">
               You need to be logged in to view order details
@@ -101,7 +122,7 @@ export default function OrderDetailPage() {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="container mx-auto py-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           <div className="space-y-6">
             <Skeleton className="h-8 w-48" />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -123,8 +144,8 @@ export default function OrderDetailPage() {
   if (error || !currentOrder) {
     return (
       <MainLayout>
-        <div className="container mx-auto py-8">
-          <div className="text-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center max-w-md mx-auto">
             <AlertCircle className="h-16 w-16 mx-auto text-destructive mb-4" />
             <h1 className="text-2xl font-bold mb-2">Order Not Found</h1>
             <p className="text-muted-foreground mb-6">
@@ -147,7 +168,7 @@ export default function OrderDetailPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
         <div className="flex items-center space-x-4 mb-8">
           <Link href="/orders">
@@ -383,8 +404,12 @@ export default function OrderDetailPage() {
                         <code className="px-2 py-1 bg-muted rounded text-sm font-mono">
                           {shipment.trackingCode}
                         </code>
-                        <Button variant="outline" size="sm">
-                          Copy
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleCopyTracking(shipment.trackingCode!)}
+                        >
+                          {isTrackingCopied ? 'Copied!' : 'Copy'}
                         </Button>
                       </div>
                     </div>
@@ -395,8 +420,11 @@ export default function OrderDetailPage() {
               <Card>
                 <CardContent className="p-6 text-center">
                   <Clock className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-muted-foreground">
-                    Shipment information will appear here once your order is processed.
+                  <p className="text-muted-foreground text-sm">
+                    Shipment information will appear here once the merchant confirms and packages your order.
+                  </p>
+                  <p className="text-xs text-primary mt-2 font-medium">
+                    Escrow Protected: Your payment is held safely until delivery.
                   </p>
                 </CardContent>
               </Card>
@@ -406,22 +434,30 @@ export default function OrderDetailPage() {
             <Card>
               <CardContent className="p-6">
                 <div className="space-y-3">
-                  <Button className="w-full" variant="outline">
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={handleChatWithMerchant}
+                  >
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Chat with Merchant
                   </Button>
                   
-                  {currentOrder.invoice && (
-                    <Button className="w-full" variant="outline">
-                      <Download className="h-4 w-4 mr-2" />
-                      Download Invoice
-                    </Button>
-                  )}
-                  
-                  <Button className="w-full" variant="outline">
-                    <Package className="h-4 w-4 mr-2" />
-                    Reorder Items
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={handlePrintSlip}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    {currentOrder.invoice ? 'Download / Print Invoice' : 'Print Order Receipt'}
                   </Button>
+                  
+                  <Link href="/products" className="block w-full">
+                    <Button className="w-full" variant="outline">
+                      <Package className="h-4 w-4 mr-2" />
+                      Browse More Products
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>

@@ -24,9 +24,14 @@ export function Sidebar() {
   const { isMerchant, isAdmin } = useAuth()
   const { currentMerchant } = useMerchants()
   
-  const isMerchantRoute = pathname.startsWith('/merchant')
-  const isAdminRoute = pathname.startsWith('/admin')
+  const isMerchantRoute = pathname === '/merchant' || pathname.startsWith('/merchant/')
+  const isAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/')
   
+  // Never show sidebar on customer-facing routes
+  if (!isMerchantRoute && !isAdminRoute) {
+    return null
+  }
+
   // Don't show merchant sidebar on the registration onboarding page
   if (pathname === '/merchant/register') {
     return null

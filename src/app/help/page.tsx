@@ -65,19 +65,19 @@ export default function HelpPage() {
 
         {/* Quick Help Categories */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
-          <Card className="text-center p-4 hover:border-primary/50 transition-colors cursor-pointer">
+          <Card onClick={() => setQuery('Telebirr')} className="text-center p-4 hover:border-primary/50 transition-colors cursor-pointer">
             <CreditCard className="h-6 w-6 text-primary mx-auto mb-2" />
             <p className="font-semibold text-xs sm:text-sm">Payments & Telebirr</p>
           </Card>
-          <Card className="text-center p-4 hover:border-primary/50 transition-colors cursor-pointer">
+          <Card onClick={() => setQuery('delivery')} className="text-center p-4 hover:border-primary/50 transition-colors cursor-pointer">
             <Truck className="h-6 w-6 text-primary mx-auto mb-2" />
             <p className="font-semibold text-xs sm:text-sm">Delivery & Zones</p>
           </Card>
-          <Card className="text-center p-4 hover:border-primary/50 transition-colors cursor-pointer">
+          <Card onClick={() => setQuery('Escrow')} className="text-center p-4 hover:border-primary/50 transition-colors cursor-pointer">
             <ShieldCheck className="h-6 w-6 text-primary mx-auto mb-2" />
             <p className="font-semibold text-xs sm:text-sm">Escrow & Safety</p>
           </Card>
-          <Card className="text-center p-4 hover:border-primary/50 transition-colors cursor-pointer">
+          <Card onClick={() => setQuery('refund')} className="text-center p-4 hover:border-primary/50 transition-colors cursor-pointer">
             <RefreshCw className="h-6 w-6 text-primary mx-auto mb-2" />
             <p className="font-semibold text-xs sm:text-sm">Returns & Refunds</p>
           </Card>

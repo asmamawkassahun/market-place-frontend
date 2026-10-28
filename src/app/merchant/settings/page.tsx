@@ -248,7 +248,7 @@ export default function MerchantSettingsPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+      <div className="w-full py-6 md:py-8">
         {/* Header */}
         <div className="mb-6 md:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">Settings</h1>

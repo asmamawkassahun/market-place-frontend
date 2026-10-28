@@ -76,17 +76,26 @@ export function MainLayout({ children }: MainLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navigation />
       
-      <div className="flex flex-1">
-        {/* Sidebar for merchant and admin routes - hidden on mobile, visible on lg+ */}
-        {showSidebar && <Sidebar />}
-        
-        {/* Main content */}
-        <main className={cn("flex-1 min-w-0", isMerchantPortal && "pb-20 lg:pb-0")}>
-          {children}
-        </main>
+      <div className="flex-1 flex justify-center w-full">
+        <div className={cn(
+          "flex flex-1 w-full",
+          showSidebar && "container mx-auto px-4 sm:px-6 lg:px-8"
+        )}>
+          {/* Sidebar for merchant and admin routes - stays inside container with the rest of the page */}
+          {showSidebar && <Sidebar />}
+          
+          {/* Main content */}
+          <main className={cn(
+            "flex-1 min-w-0",
+            showSidebar && "lg:pl-6 xl:pl-8",
+            isMerchantPortal && "pb-20 lg:pb-0"
+          )}>
+            {children}
+          </main>
+        </div>
       </div>
 
       {/* Mobile Bottom Navigation for Merchants on smaller devices */}

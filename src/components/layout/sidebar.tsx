@@ -64,8 +64,8 @@ export function Sidebar() {
   const navItems = isMerchantRoute ? merchantNavItems : adminNavItems
 
   return (
-    <aside className="hidden lg:block w-64 shrink-0 bg-card/60 backdrop-blur-xs border-r min-h-[calc(100vh-4rem)] sticky top-16 self-start">
-      <div className="p-6">
+    <aside className="hidden lg:block w-64 shrink-0 border-r min-h-[calc(100vh-4rem)] sticky top-16 self-start">
+      <div className="py-6 pr-6 pl-0">
         <div className="flex items-center space-x-3 mb-8">
           <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-xs">
             {isMerchantRoute ? <Store className="h-5 w-5 text-primary" /> : <Shield className="h-5 w-5 text-primary" />}

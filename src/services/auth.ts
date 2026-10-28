@@ -7,7 +7,7 @@ export interface RequestOTPRequest {
 
 export interface VerifyOTPRequest {
   email: string
-  otp: string
+  code: string
 }
 
 export interface RefreshTokenRequest {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { MainLayout } from '@/components/layout/main-layout'
 import { ProductCard } from '@/components/products/product-card'
@@ -15,7 +15,7 @@ import { useProducts } from '@/hooks/useProducts'
 import { UnitType } from '@/types'
 import { cn } from '@/lib/utils'
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -366,5 +366,13 @@ export default function ProductsPage() {
         )}
       </div>
     </MainLayout>
+  )
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto p-8"><Skeleton className="h-96 w-full" /></div>}>
+      <ProductsContent />
+    </Suspense>
   )
 }

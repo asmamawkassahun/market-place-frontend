@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     
     // Forward the request to the backend
-    const response = await fetch('http://localhost:3004/api/auth/verify-otp', {
+    const response = await fetch('http://localhost:3001/api/auth/verify-otp', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

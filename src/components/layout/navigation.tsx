@@ -9,11 +9,10 @@ import { useCart } from '@/hooks/useCart'
 import { useChat } from '@/hooks/useChat'
 import { useNotifications } from '@/hooks/useNotifications'
 import { MobileNavigation } from './mobile-navigation'
-import { QuickActions } from './quick-actions'
 import { NotificationDropdown } from '@/components/notifications/notification-center'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +24,6 @@ import {
 import {
   ShoppingCart,
   User,
-  Menu,
   Search,
   Bell,
   MessageCircle,
@@ -34,58 +32,56 @@ import {
   LogOut,
   Heart,
   MapPin,
-  CreditCard,
   Truck,
   Star,
   HelpCircle,
   ChevronDown,
-  Package,
   BarChart3,
-  FileText,
-  Shield
+  Shield,
+  Layers
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function Navigation() {
-  const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
-  const { user, isAuthenticated, logout, isUser, isMerchant, isAdmin } = useAuth()
+  const { user, isAuthenticated, logout, isMerchant, isAdmin } = useAuth()
   const { totalItems } = useCart()
-  const { unreadCount } = useChat()
   const { unreadCount: notificationCount } = useNotifications()
+  const [searchKeyword, setSearchKeyword] = useState('')
 
-  const isCustomerRoute = pathname.startsWith('/') && !pathname.startsWith('/merchant/') && !pathname.startsWith('/admin/')
-  const isMerchantRoute = pathname.startsWith('/merchant/')
-  const isAdminRoute = pathname.startsWith('/admin/')
+  const isMerchantRoute = pathname.startsWith('/merchant')
+  const isAdminRoute = pathname.startsWith('/admin')
+  const isCustomerRoute = !isMerchantRoute && !isAdminRoute
 
   const customerNavItems = [
     { name: 'Home', href: '/' },
     { name: 'Products', href: '/products' },
     { name: 'Merchants', href: '/merchants' },
-    // { name: 'Orders', href: '/orders' },
-    // { name: 'Wishlist', href: '/wishlist' },
-    // { name: 'Help', href: '/help' },
+    { name: 'Bulk Orders', href: '/bulk-orders' },
   ]
 
   const customerAccountItems = [
+    { name: 'My Profile', href: '/profile', icon: User },
     { name: 'Orders', href: '/orders', icon: Truck },
     { name: 'Wishlist', href: '/wishlist', icon: Heart },
     { name: 'Addresses', href: '/profile/addresses', icon: MapPin },
-    { name: 'Loyalty', href: '/profile/loyalty', icon: Star },
-    { name: 'Reviews', href: '/profile/reviews', icon: Star },
-    { name: 'Help', href: '/help', icon: HelpCircle },
+    { name: 'Loyalty Points', href: '/profile/loyalty', icon: Star },
+    { name: 'My Reviews', href: '/profile/reviews', icon: Star },
+    { name: 'Help & Support', href: '/help', icon: HelpCircle },
   ]
 
   const merchantNavItems = [
     { name: 'Dashboard', href: '/merchant/dashboard' },
     { name: 'Products', href: '/merchant/products' },
     { name: 'Orders', href: '/merchant/orders' },
+    { name: 'Inventory', href: '/merchant/inventory' },
     { name: 'Chat', href: '/merchant/chat' },
   ]
 
   const merchantAccountItems = [
     { name: 'Analytics', href: '/merchant/analytics', icon: BarChart3 },
+    { name: 'Store Profile', href: '/merchant/profile', icon: Store },
     { name: 'Settings', href: '/merchant/settings', icon: Settings },
   ]
 
@@ -97,9 +93,8 @@ export function Navigation() {
   ]
 
   const adminAccountItems = [
-    { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
-    { name: 'System', href: '/admin/system', icon: Shield },
-    { name: 'Settings', href: '/admin/settings', icon: Settings },
+    { name: 'Analytics', href: '/admin/dashboard', icon: BarChart3 },
+    { name: 'System', href: '/admin/merchants', icon: Shield },
   ]
 
   const getNavItems = () => {
@@ -114,233 +109,211 @@ export function Navigation() {
     return customerAccountItems
   }
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchKeyword.trim()) {
+      router.push(`/products?q=${encodeURIComponent(searchKeyword.trim())}`)
+    } else {
+      router.push('/products')
+    }
+  }
+
   const handleLogout = async () => {
     await logout()
-    setIsOpen(false)
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className=" px-4 md:px-6 lg:px-8 xl:px-14 w-full">
-        <div className="flex h-16 w-full items-center justify-between gap-2 lg:gap-4">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-xs">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 w-full items-center justify-between gap-3 md:gap-6">
+          {/* Brand Logo */}
+          <Link href="/" className="flex items-center space-x-2 shrink-0 group">
             <Image
               src="/logo.svg"
-              alt="MAJET"
-              width={34}
-              height={8}
-              className="h-8 lg:h-10 w-full"
+              alt="MAJET Marketplace"
+              width={140}
+              height={36}
+              className="h-8 md:h-9 w-auto object-contain transition-transform group-hover:scale-105"
+              priority
             />
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center flex-1 justify-between px-12  ">
-            {/* Main Navigation Links */}
-            <div className="flex items-center gap-2 lg:gap-4 xl:gap-6 flex-shrink-0">
-              {getNavItems().map((item) => (
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0">
+            {getNavItems().map((item) => {
+              const isActive = pathname === item.href
+              return (
                 <Link
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "text-sm font-medium transition-colors hover:text-primary whitespace-nowrap",
-                    pathname === item.href ? "text-primary" : "text-muted-foreground"
+                    "px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap",
+                    isActive
+                      ? "bg-primary/10 text-primary font-semibold"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                   )}
                 >
                   {item.name}
                 </Link>
-              ))}
-            </div>
-
-            {/* Quick Actions - Only show when not authenticated */}
-            {!isAuthenticated && (
-              <div className="flex items-center flex-1 max-w-md">
-                <QuickActions
-                  isAuthenticated={isAuthenticated}
-                  isMerchant={isMerchant}
-                  isAdmin={isAdmin}
-                  onNavClick={(href) => router.push(href)}
-                  onLogout={handleLogout}
-                  variant="desktop"
-                />
-              </div>
-            )}
-
-            {/* Additional navigation items for customers */}
-            {isCustomerRoute && isAuthenticated && (
-              <div className="flex items-center gap-2 lg:gap-4 flex-shrink-0">
-                <Link href="/orders">
-                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
-                    <Truck className="h-4 w-4 mr-2" />
-                    <span className="hidden lg:inline">Orders</span>
-                  </Button>
-                </Link>
-                <Link href="/wishlist">
-                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
-                    <Heart className="h-4 w-4 mr-2" />
-                    <span className="hidden lg:inline">Wishlist</span>
-                  </Button>
-                </Link>
-                <Link href="/help">
-                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
-                    <HelpCircle className="h-4 w-4 mr-2" />
-                    <span className="hidden lg:inline">Help</span>
-                  </Button>
-                </Link>
-              </div>
-            )}
-
-            {/* Additional navigation items for merchants */}
-            {isMerchantRoute && isAuthenticated && isMerchant && (
-              <div className="flex items-center gap-2 lg:gap-4 flex-shrink-0">
-                <Link href="/merchant/analytics">
-                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
-                    <BarChart3 className="h-4 w-4 mr-2" />
-                    <span className="hidden lg:inline">Analytics</span>
-                  </Button>
-                </Link>
-                <Link href="/merchant/settings">
-                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
-                    <Settings className="h-4 w-4 mr-2" />
-                    <span className="hidden lg:inline">Settings</span>
-                  </Button>
-                </Link>
-              </div>
-            )}
-
-            {/* Additional navigation items for admins */}
-            {isAdminRoute && isAuthenticated && isAdmin && (
-              <div className="flex items-center gap-2 lg:gap-4 flex-shrink-0">
-                <Link href="/admin/analytics">
-                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
-                    <BarChart3 className="h-4 w-4 mr-2" />
-                    <span className="hidden lg:inline">Analytics</span>
-                  </Button>
-                </Link>
-                <Link href="/admin/system">
-                  <Button variant="ghost" size="sm" className="text-sm whitespace-nowrap">
-                    <Shield className="h-4 w-4 mr-2" />
-                    <span className="hidden lg:inline">System</span>
-                  </Button>
-                </Link>
-              </div>
-            )}
+              )
+            })}
           </nav>
 
-          {/* Right side actions */}
-          <div className="hidden lg:flex items-center gap-2 lg:gap-4 flex-shrink-0">
-          {/* Search - Hidden from navbar, available in mobile menu */}
-          <Button variant="ghost" size="icon" className="hidden">
-            <Search className="h-4 w-4" />
-          </Button>
-
-          {/* Cart - Hidden from navbar, available in mobile menu */}
+          {/* Customer / Visitor Live Search Bar */}
           {isCustomerRoute && (
-            <Link href="/cart" className="hidden">
-              <Button variant="ghost" size="icon" className="relative">
-                <ShoppingCart className="h-4 w-4" />
-                {totalItems > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-                    {totalItems}
-                  </Badge>
-                )}
-              </Button>
-            </Link>
+            <div className="hidden md:flex flex-1 max-w-md mx-2">
+              <form onSubmit={handleSearchSubmit} className="relative w-full">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  type="search"
+                  placeholder="Search products, coffee, spices, textiles..."
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  className="pl-9 pr-4 h-9.5 w-full rounded-full bg-muted/50 border-input/60 text-sm focus-visible:bg-background focus-visible:border-primary transition-colors"
+                />
+              </form>
+            </div>
           )}
 
-          {/* Chat (for all authenticated users) */}
-          {isAuthenticated && (isCustomerRoute || (isMerchantRoute && isMerchant) || (isAdminRoute && isAdmin)) && (
-            <Link href={isMerchantRoute ? "/merchant/chat" : "/chat"}>
-              <Button variant="ghost" size="icon">
-                <MessageCircle className="h-4 w-4" />
-              </Button>
-            </Link>
-          )}
+          {/* Right Side Actions */}
+          <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
+            {/* Shopping Cart (Always visible on customer routes for authenticated and guest users) */}
+            {isCustomerRoute && (
+              <Link href="/cart">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors"
+                  title="Shopping Cart"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  {totalItems > 0 && (
+                    <Badge className="absolute -top-1 -right-1 h-5 min-w-5 px-1 rounded-full p-0 flex items-center justify-center text-[11px] font-bold bg-primary text-primary-foreground shadow-xs">
+                      {totalItems}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
+            )}
 
-          {/* Notifications */}
-          {isAuthenticated && (
-            <NotificationDropdown>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative"
-              >
-                <Bell className="h-4 w-4" />
-                {notificationCount > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-                    {notificationCount}
-                  </Badge>
-                )}
-              </Button>
-            </NotificationDropdown>
-          )}
+            {/* Chat (for authenticated users) */}
+            {isAuthenticated && (
+              <Link href={isMerchantRoute ? "/merchant/chat" : "/chat"}>
+                <Button variant="ghost" size="icon" className="cursor-pointer" title="Messages">
+                  <MessageCircle className="h-5 w-5" />
+                </Button>
+              </Link>
+            )}
 
-          {/* User Menu */}
-          {isAuthenticated ? (
-            <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium hidden lg:block">{user?.name || user?.email}</span>
+            {/* Notifications (for authenticated users) */}
+            {isAuthenticated && (
+              <NotificationDropdown>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative cursor-pointer"
+                  title="Notifications"
+                >
+                  <Bell className="h-5 w-5" />
+                  {notificationCount > 0 && (
+                    <Badge className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
+                      {notificationCount}
+                    </Badge>
+                  )}
+                </Button>
+              </NotificationDropdown>
+            )}
 
-              {/* Account Dropdown */}
+            {/* User Account / Auth Actions */}
+            {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-1">
-                    <User className="h-4 w-4" />
-                    <ChevronDown className="h-3 w-3" />
+                  <Button variant="outline" size="sm" className="flex items-center gap-2 cursor-pointer border-input/80">
+                    <User className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-medium max-w-[120px] truncate">
+                      {user?.name || user?.email?.split('@')[0] || 'My Account'}
+                    </span>
+                    <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuContent align="end" className="w-56 mt-1">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-semibold">{user?.name || 'Account'}</p>
+                      <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
 
-                  {/* Account Items */}
                   {getAccountItems().map((item) => {
                     const Icon = item.icon
                     return (
-                      <DropdownMenuItem key={item.name} asChild>
+                      <DropdownMenuItem key={item.name} asChild className="cursor-pointer">
                         <Link href={item.href} className="flex items-center">
-                          <Icon className="h-4 w-4 mr-2" />
+                          <Icon className="h-4 w-4 mr-2 text-muted-foreground" />
                           {item.name}
                         </Link>
                       </DropdownMenuItem>
                     )
                   })}
 
-                  <DropdownMenuSeparator />
-
-                  {/* Quick Actions */}
                   {isCustomerRoute && !isMerchant && !isAdmin && (
-                    <DropdownMenuItem asChild>
-                      <Link href="/merchant/register" className="flex items-center">
-                        <Store className="h-4 w-4 mr-2" />
-                        Become a Merchant
-                      </Link>
-                    </DropdownMenuItem>
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild className="cursor-pointer">
+                        <Link href="/merchant/register" className="flex items-center text-primary font-medium">
+                          <Store className="h-4 w-4 mr-2" />
+                          Become a Merchant
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
                   )}
 
                   <DropdownMenuSeparator />
-
-                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>
-          ) : (
-            <div className="hidden items-center space-x-2">
-              <Link href="/login">
-                <Button variant="ghost" className='cursor-pointer'>Login</Button>
-              </Link>
-              <Link href="/signup">
-                <Button className='cursor-pointer'>Sign Up</Button>
-              </Link>
-            </div>
-          )}
-
+            ) : (
+              <div className="flex items-center gap-2">
+                {isCustomerRoute && (
+                  <Link href="/merchant/register" className="hidden xl:inline-flex">
+                    <Button variant="ghost" size="sm" className="text-xs font-medium text-muted-foreground hover:text-foreground cursor-pointer">
+                      <Store className="h-3.5 w-3.5 mr-1 text-primary" />
+                      Sell on Majet
+                    </Button>
+                  </Link>
+                )}
+                <Link href="/login">
+                  <Button variant="outline" size="sm" className="cursor-pointer">
+                    Log In
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button size="sm" className="cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90">
+                    Sign Up
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
 
-          {/* Mobile Menu - Visible on small and medium screens only */}
-          <div className="flex items-center lg:hidden">
+          {/* Mobile Right Bar: Cart & Mobile Navigation */}
+          <div className="flex items-center gap-1 lg:hidden">
+            {isCustomerRoute && (
+              <Link href="/cart">
+                <Button variant="ghost" size="icon" className="relative cursor-pointer" title="Cart">
+                  <ShoppingCart className="h-5 w-5" />
+                  {totalItems > 0 && (
+                    <Badge className="absolute -top-1 -right-1 h-4.5 min-w-4.5 px-1 rounded-full p-0 flex items-center justify-center text-[10px] font-bold bg-primary text-primary-foreground">
+                      {totalItems}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
+            )}
             <MobileNavigation />
           </div>
         </div>

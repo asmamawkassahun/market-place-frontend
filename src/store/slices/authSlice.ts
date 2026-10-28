@@ -33,7 +33,9 @@ export const requestOtp = createAsyncThunk(
       const response = await authApi.requestOtp(data.email)
       return response.data
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to request OTP')
+      const errData = error.response?.data
+      const msg = errData?.message || errData?.error?.message || 'Failed to request OTP'
+      return rejectWithValue(msg)
     }
   }
 )
@@ -43,7 +45,12 @@ export const verifyOtp = createAsyncThunk(
   async (data: VerifyOtpRequest, { rejectWithValue }) => {
     try {
       const response = await authApi.verifyOtp(data.email, data.code)
-      const { access_token, user } = response.data.data
+      const responseData = response.data?.data || response.data
+      const { access_token, user } = responseData
+      
+      if (!access_token) {
+        return rejectWithValue('No access token received from server')
+      }
       
       // Store token in localStorage
       if (typeof window !== 'undefined') {
@@ -52,7 +59,9 @@ export const verifyOtp = createAsyncThunk(
       
       return { access_token, user }
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to verify OTP')
+      const errData = error.response?.data
+      const msg = errData?.message || errData?.error?.message || 'Failed to verify OTP'
+      return rejectWithValue(msg)
     }
   }
 )

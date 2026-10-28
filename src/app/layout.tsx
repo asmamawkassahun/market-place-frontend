@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import { ToastProvider } from "@/components/ui/toast";
 
-const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
-  title: "Ethiopia E-commerce",
-  description: "Ethiopia-first e-commerce platform with local payment methods and unit-aware catalog",
+  title: "Majet Marketplace - Ethiopia's Premier E-Commerce Platform",
+  description: "Ethiopia's premier marketplace platform with local payment methods (Telebirr, CBE Birr, Chapa, Amole) and unit-aware catalog (KG, Liter, Meter).",
 };
 
 export default function RootLayout({
@@ -18,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} `}>
+    <html lang="en" suppressHydrationWarning>
+      <body className="font-sans antialiased min-h-screen bg-background text-foreground">
         <Providers>
           <ToastProvider>
             {children}

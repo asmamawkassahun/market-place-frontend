@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils'
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [otp, setOtp] = useState('')
+  const [devOtp, setDevOtp] = useState<string | null>(null)
   const [step, setStep] = useState<'email' | 'otp'>('email')
   const [countdown, setCountdown] = useState(0)
   const router = useRouter()
@@ -27,6 +28,14 @@ export default function LoginPage() {
     
     const result = await requestOtp(email)
     if (result.type === 'auth/requestOtp/fulfilled') {
+      // In dev mode, the backend returns the OTP in the response
+      const payload = result.payload as any
+      const otpFromServer = payload?.data?.otp
+      if (otpFromServer) {
+        setOtp(otpFromServer)
+        setDevOtp(otpFromServer)
+      }
+      
       setStep('otp')
       setCountdown(60)
       
@@ -156,6 +165,11 @@ export default function LoginPage() {
                   <p className="text-xs text-muted-foreground">
                     Check your email for the verification code
                   </p>
+                  {devOtp && (
+                    <p className="text-xs text-green-600 font-medium mt-1">
+                      Dev mode: OTP auto-filled ({devOtp})
+                    </p>
+                  )}
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

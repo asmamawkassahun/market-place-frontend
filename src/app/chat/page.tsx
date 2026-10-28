@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ import Image from 'next/image';
 import { useMerchants } from '@/hooks/useMerchants';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
-export default function ChatPage() {
+function ChatContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const merchantId = searchParams.get('merchantId');
@@ -169,6 +169,14 @@ export default function ChatPage() {
         </div>
       </div>
     </MainLayout>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto p-8"><Skeleton className="h-96 w-full" /></div>}>
+      <ChatContent />
+    </Suspense>
   );
 }
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Package, AlertTriangle, Clock, TrendingUp, MapPin, Plus, Filter, Download } from 'lucide-react'
+import { Package, AlertTriangle, Clock, TrendingUp, MapPin, Plus, Filter, Download, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useInventory } from '@/hooks/useInventory'
 import { useAuth } from '@/hooks/useAuth'
+import { useProducts } from '@/hooks/useProducts'
 import { InventoryLot, InventoryMovement, InventoryAnalytics, StockAlert } from '@/types/inventory'
 import { cn } from '@/lib/utils'
 
@@ -26,8 +27,20 @@ export function InventoryDashboard({ className }: InventoryDashboardProps) {
   const [isAddLotDialogOpen, setIsAddLotDialogOpen] = useState(false)
   const [analytics, setAnalytics] = useState<InventoryAnalytics | null>(null)
   const [alerts, setAlerts] = useState<StockAlert[]>([])
+  
+  const [newStock, setNewStock] = useState({
+    skuId: '',
+    quantity: '',
+    expiry: '',
+    locationId: '',
+    batchNumber: '',
+    supplier: '',
+    costPrice: '',
+  })
+  const [isAddingStock, setIsAddingStock] = useState(false)
 
   const { isAuthenticated } = useAuth()
+  const { products, fetchProducts } = useProducts()
   const { 
     lots, 
     movements, 
@@ -37,7 +50,8 @@ export function InventoryDashboard({ className }: InventoryDashboardProps) {
     loadInventoryMovements,
     loadInventoryLocations,
     loadInventoryAnalytics,
-    loadStockAlerts
+    loadStockAlerts,
+    createInventoryLot
   } = useInventory()
 
   useEffect(() => {
@@ -45,16 +59,63 @@ export function InventoryDashboard({ className }: InventoryDashboardProps) {
       loadInventoryLots()
       loadInventoryMovements()
       loadInventoryLocations()
-      loadInventoryAnalytics().then((data) => setAnalytics(data.analytics as any || null)).catch(console.error)
-      loadStockAlerts().then((data) => setAlerts(data.alerts as any || [])).catch(console.error)
+      fetchProducts({ merchant: 'current' })
+      loadInventoryAnalytics().then((data) => setAnalytics(data?.analytics as any || null)).catch(console.error)
+      loadStockAlerts().then((data) => setAlerts(data?.alerts as any || [])).catch(console.error)
     }
-  }, [isAuthenticated, loadInventoryLots, loadInventoryMovements, loadInventoryLocations, loadInventoryAnalytics, loadStockAlerts])
+  }, [isAuthenticated, loadInventoryLots, loadInventoryMovements, loadInventoryLocations, fetchProducts, loadInventoryAnalytics, loadStockAlerts])
 
-  const filteredLots = lots.filter(lot => {
+  const availableSkus = products?.flatMap(product => 
+    (product.skus || []).map(sku => ({
+      id: sku.id,
+      label: `${product.name} - ${sku.name || sku.unitType} (${sku.unitIncrement} ${sku.unitType})`,
+      unitType: sku.unitType
+    }))
+  ) || []
+
+  const handleAddStock = async () => {
+    if (!newStock.skuId || !newStock.quantity) {
+      alert('Please select a SKU and enter a valid quantity')
+      return
+    }
+    setIsAddingStock(true)
+    try {
+      await createInventoryLot({
+        skuId: newStock.skuId,
+        quantity: parseFloat(newStock.quantity),
+        expiry: newStock.expiry || undefined,
+        locationId: newStock.locationId || undefined,
+        batchNumber: newStock.batchNumber || undefined,
+        supplier: newStock.supplier || undefined,
+        costPrice: newStock.costPrice ? Math.round(parseFloat(newStock.costPrice) * 100) : undefined,
+      })
+      setIsAddLotDialogOpen(false)
+      setNewStock({
+        skuId: '',
+        quantity: '',
+        expiry: '',
+        locationId: '',
+        batchNumber: '',
+        supplier: '',
+        costPrice: '',
+      })
+      loadInventoryLots()
+    } catch (err: any) {
+      console.error('Failed to add stock lot:', err)
+      alert(err?.message || 'Failed to add stock lot')
+    } finally {
+      setIsAddingStock(false)
+    }
+  }
+
+  const filteredLots = (lots || []).filter(lot => {
     const matchesLocation = selectedLocation === 'all' || lot.locationId === selectedLocation
+    const skuName = lot.sku?.name?.toLowerCase() || ''
+    const productName = lot.sku?.product?.name?.toLowerCase() || ''
+    const query = searchQuery.toLowerCase()
     const matchesSearch = searchQuery === '' || 
-      lot.sku.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lot.sku.product.name.toLowerCase().includes(searchQuery.toLowerCase())
+      skuName.includes(query) ||
+      productName.includes(query)
     return matchesLocation && matchesSearch
   })
 
@@ -96,14 +157,14 @@ export function InventoryDashboard({ className }: InventoryDashboardProps) {
   return (
     <div className={cn('space-y-6', className)}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Inventory Management</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-xl sm:text-2xl font-bold">Inventory Management</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Manage your inventory, track stock levels, and monitor movements
           </p>
         </div>
-        <div className="flex space-x-2">
+        <div className="flex items-center space-x-2 self-start sm:self-auto">
           <Button variant="outline">
             <Download className="h-4 w-4 mr-2" />
             Export
@@ -121,32 +182,58 @@ export function InventoryDashboard({ className }: InventoryDashboardProps) {
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="sku">Select Product SKU</Label>
-                  <Select>
+                  <Label htmlFor="sku">Select Product SKU *</Label>
+                  <Select 
+                    value={newStock.skuId} 
+                    onValueChange={(val) => setNewStock(prev => ({ ...prev, skuId: val }))}
+                  >
                     <SelectTrigger>
-                      <SelectValue placeholder="Choose a product SKU" />
+                      <SelectValue placeholder={availableSkus.length === 0 ? "No product variants found" : "Choose a product variant"} />
                     </SelectTrigger>
                     <SelectContent>
-                      {/* This would be populated with available SKUs */}
+                      {availableSkus.map((sku) => (
+                        <SelectItem key={sku.id} value={sku.id}>
+                          {sku.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="quantity">Quantity</Label>
-                  <Input id="quantity" type="number" placeholder="Enter quantity" />
+                  <Label htmlFor="quantity">Quantity *</Label>
+                  <Input 
+                    id="quantity" 
+                    type="number" 
+                    min="0.1" 
+                    step="0.1"
+                    placeholder="Enter quantity" 
+                    value={newStock.quantity}
+                    onChange={(e) => setNewStock(prev => ({ ...prev, quantity: e.target.value }))}
+                  />
                 </div>
                 <div>
                   <Label htmlFor="expiry">Expiry Date (Optional)</Label>
-                  <Input id="expiry" type="date" />
+                  <Input 
+                    id="expiry" 
+                    type="date" 
+                    value={newStock.expiry}
+                    onChange={(e) => setNewStock(prev => ({ ...prev, expiry: e.target.value }))}
+                  />
                 </div>
                 <div>
-                  <Label htmlFor="location">Location</Label>
-                  <Select>
+                  <Label htmlFor="location">Location (Optional)</Label>
+                  <Select 
+                    value={newStock.locationId} 
+                    onValueChange={(val) => setNewStock(prev => ({ ...prev, locationId: val }))}
+                  >
                     <SelectTrigger>
-                      <SelectValue placeholder="Choose a location" />
+                      <SelectValue placeholder="Choose a storage location" />
                     </SelectTrigger>
                     <SelectContent>
-                      {locations.map((location) => (
+                      {(locations && locations.length > 0 ? locations : [
+                        { id: 'main-store', name: 'Main Storefront / Warehouse' },
+                        { id: 'addis-storage', name: 'Addis Ababa Central Storage' }
+                      ]).map((location) => (
                         <SelectItem key={location.id} value={location.id}>
                           {location.name}
                         </SelectItem>
@@ -156,22 +243,46 @@ export function InventoryDashboard({ className }: InventoryDashboardProps) {
                 </div>
                 <div>
                   <Label htmlFor="batchNumber">Batch Number (Optional)</Label>
-                  <Input id="batchNumber" placeholder="Enter batch number" />
+                  <Input 
+                    id="batchNumber" 
+                    placeholder="e.g. BATCH-2026-001" 
+                    value={newStock.batchNumber}
+                    onChange={(e) => setNewStock(prev => ({ ...prev, batchNumber: e.target.value }))}
+                  />
                 </div>
                 <div>
                   <Label htmlFor="supplier">Supplier (Optional)</Label>
-                  <Input id="supplier" placeholder="Enter supplier name" />
+                  <Input 
+                    id="supplier" 
+                    placeholder="Enter supplier name" 
+                    value={newStock.supplier}
+                    onChange={(e) => setNewStock(prev => ({ ...prev, supplier: e.target.value }))}
+                  />
                 </div>
                 <div>
-                  <Label htmlFor="costPrice">Cost Price (Optional)</Label>
-                  <Input id="costPrice" type="number" placeholder="Enter cost price in ETB" />
+                  <Label htmlFor="costPrice">Cost Price in ETB (Optional)</Label>
+                  <Input 
+                    id="costPrice" 
+                    type="number" 
+                    step="0.01"
+                    placeholder="0.00" 
+                    value={newStock.costPrice}
+                    onChange={(e) => setNewStock(prev => ({ ...prev, costPrice: e.target.value }))}
+                  />
                 </div>
-                <div className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => setIsAddLotDialogOpen(false)}>
+                <div className="flex justify-end space-x-2 pt-2">
+                  <Button variant="outline" onClick={() => setIsAddLotDialogOpen(false)} disabled={isAddingStock}>
                     Cancel
                   </Button>
-                  <Button onClick={() => setIsAddLotDialogOpen(false)}>
-                    Add Stock
+                  <Button onClick={handleAddStock} disabled={isAddingStock}>
+                    {isAddingStock ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      'Add Stock'
+                    )}
                   </Button>
                 </div>
               </div>
@@ -324,20 +435,21 @@ export function InventoryDashboard({ className }: InventoryDashboardProps) {
               ) : (
                 <div className="space-y-4">
                   {filteredLots.map((lot) => {
-                    const stockStatus = getStockStatus(lot.quantity, lot.sku.unitType)
+                    const unit = lot.sku?.unitType || 'PIECE'
+                    const stockStatus = getStockStatus(lot.quantity, unit)
                     const expiryStatus = getExpiryStatus(lot.expiry)
                     
                     return (
-                      <div key={lot.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div key={lot.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg">
                         <div className="flex items-center gap-4">
                           <img
-                            src={lot.sku.product.images[0] || '/placeholder-product.jpg'}
-                            alt={lot.sku.product.name}
+                            src={lot.sku?.product?.images?.[0] || '/placeholder-product.jpg'}
+                            alt={lot.sku?.product?.name || lot.sku?.name || 'Product'}
                             className="w-12 h-12 object-cover rounded"
                           />
                           <div>
-                            <h4 className="font-medium">{lot.sku.product.name}</h4>
-                            <p className="text-sm text-muted-foreground">{lot.sku.name}</p>
+                            <h4 className="font-medium">{lot.sku?.product?.name || 'Product'}</h4>
+                            <p className="text-sm text-muted-foreground">{lot.sku?.name || 'Default Variant'}</p>
                             <div className="flex items-center gap-2 mt-1">
                               <Badge className={stockStatus.color}>
                                 {stockStatus.label}
@@ -350,7 +462,7 @@ export function InventoryDashboard({ className }: InventoryDashboardProps) {
                         </div>
                         <div className="text-right">
                           <p className="font-medium">
-                            {lot.quantity} {lot.sku.unitType.toLowerCase()}
+                            {lot.quantity} {unit.toLowerCase()}
                           </p>
                           {lot.location && (
                             <p className="text-sm text-muted-foreground flex items-center gap-1">
@@ -395,7 +507,7 @@ export function InventoryDashboard({ className }: InventoryDashboardProps) {
               ) : (
                 <div className="space-y-4">
                   {movements.slice(0, 10).map((movement) => (
-                    <div key={movement.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div key={movement.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg">
                       <div className="flex items-center gap-4">
                         <div className={cn(
                           'w-10 h-10 rounded-full flex items-center justify-center',
@@ -406,9 +518,9 @@ export function InventoryDashboard({ className }: InventoryDashboardProps) {
                           {movement.type === 'IN' ? '+' : movement.type === 'OUT' ? '-' : '±'}
                         </div>
                         <div>
-                          <h4 className="font-medium">{movement.lot.sku.product.name}</h4>
+                          <h4 className="font-medium">{movement.lot?.sku?.product?.name || movement.lot?.sku?.name || 'Product'}</h4>
                           <p className="text-sm text-muted-foreground">
-                            {movement.type} - {movement.quantity} {movement.lot.sku.unitType.toLowerCase()}
+                            {movement.type} - {movement.quantity} {(movement.lot?.sku?.unitType || 'piece').toLowerCase()}
                           </p>
                           {movement.reason && (
                             <p className="text-xs text-muted-foreground">{movement.reason}</p>

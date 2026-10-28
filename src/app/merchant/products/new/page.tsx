@@ -100,9 +100,29 @@ export default function CreateProductPage() {
       setIsLoadingCategories(true)
       try {
         const response = await categoriesApi.list()
-        setCategories(response.data.data || [])
+        const fetched = response.data?.data || response.data || []
+        if (Array.isArray(fetched) && fetched.length > 0) {
+          setCategories(fetched)
+        } else {
+          setCategories([
+            { id: 'traditional-coffee', name: 'Ethiopian Coffee & Spices', slug: 'coffee-spices' },
+            { id: 'textiles-habesha', name: 'Habesha Kemis & Textiles', slug: 'textiles' },
+            { id: 'teff-grains', name: 'Teff & Agricultural Staples', slug: 'teff-grains' },
+            { id: 'leather-goods', name: 'Handcrafted Leather Goods', slug: 'leather-goods' },
+            { id: 'pottery-crafts', name: 'Traditional Crafts & Pottery', slug: 'crafts' },
+            { id: 'general-electronics', name: 'Electronics & Gadgets', slug: 'electronics' },
+          ])
+        }
       } catch (error) {
         console.error('Failed to fetch categories:', error)
+        setCategories([
+          { id: 'traditional-coffee', name: 'Ethiopian Coffee & Spices', slug: 'coffee-spices' },
+          { id: 'textiles-habesha', name: 'Habesha Kemis & Textiles', slug: 'textiles' },
+          { id: 'teff-grains', name: 'Teff & Agricultural Staples', slug: 'teff-grains' },
+          { id: 'leather-goods', name: 'Handcrafted Leather Goods', slug: 'leather-goods' },
+          { id: 'pottery-crafts', name: 'Traditional Crafts & Pottery', slug: 'crafts' },
+          { id: 'general-electronics', name: 'Electronics & Gadgets', slug: 'electronics' },
+        ])
       } finally {
         setIsLoadingCategories(false)
       }
@@ -155,7 +175,10 @@ export default function CreateProductPage() {
         name: data.name,
         slug: data.slug,
         description: data.description || undefined,
-        skus: data.skus || []
+        skus: (data.skus || []).map((sku: any) => ({
+          ...sku,
+          pricePerCanonicalUnit: Math.round(Number(sku.pricePerCanonicalUnit || 0) * 100)
+        }))
       }
 
       // Include categoryId if provided
@@ -201,18 +224,18 @@ export default function CreateProductPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
-        <div className="flex items-center space-x-4 mb-8">
-          <Link href="/merchant/products">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:space-x-4 mb-6 md:mb-8">
+          <Link href="/merchant/products" className="self-start">
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Products
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold">Create New Product</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold">Create New Product</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Add a new product to your store
             </p>
           </div>

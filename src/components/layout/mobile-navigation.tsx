@@ -23,7 +23,8 @@ import {
   Heart,
   HelpCircle,
   LogOut,
-  Layers
+  Layers,
+  BarChart3
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
@@ -44,10 +45,11 @@ const customerNavItems = [
 const merchantNavItems = [
   { name: 'Dashboard', href: '/merchant/dashboard', icon: Home },
   { name: 'Products', href: '/merchant/products', icon: Package },
-  { name: 'Orders', href: '/merchant/orders', icon: Truck },
   { name: 'Inventory', href: '/merchant/inventory', icon: Layers },
-  { name: 'Chat', href: '/merchant/chat', icon: MessageSquare },
+  { name: 'Orders', href: '/merchant/orders', icon: Truck },
   { name: 'Store Profile', href: '/merchant/profile', icon: Store },
+  { name: 'Chat', href: '/merchant/chat', icon: MessageSquare },
+  { name: 'Analytics', href: '/merchant/analytics', icon: BarChart3 },
   { name: 'Settings', href: '/merchant/settings', icon: Settings },
 ]
 
@@ -199,6 +201,20 @@ export function MobileNavigation({ className }: MobileNavigationProps) {
           })}
 
           <Separator className="my-3" />
+
+          {/* Merchant Extra Switch Link */}
+          {isMerchant && (
+            <div className="space-y-1">
+              <Button
+                variant="ghost"
+                className="w-full justify-start h-10 text-sm font-medium text-primary hover:bg-primary/10 cursor-pointer"
+                onClick={() => handleNavClick('/products')}
+              >
+                <Store className="h-4 w-4 mr-3 text-primary" />
+                <span>View Customer Marketplace</span>
+              </Button>
+            </div>
+          )}
 
           {/* Customer Extra Links */}
           {!isMerchant && !isAdmin && (

@@ -37,15 +37,17 @@ export default function ProductDetailPage() {
   const [categoryName, setCategoryName] = useState<string | null>(null)
 
   const { isAuthenticated, isMerchant } = useAuth()
-  const { products, isLoading, error, fetchProducts, deleteProduct } = useProducts()
+  const { products, currentProduct, isLoading, error, loadProduct, fetchProducts, deleteProduct } = useProducts()
 
-  const product = products?.find(p => p.id === productId)
+  const product = (currentProduct && currentProduct.id === productId)
+    ? currentProduct
+    : products?.find(p => p.id === productId)
 
   useEffect(() => {
-    if (isAuthenticated && isMerchant && !products) {
-      fetchProducts({ merchant: 'current' })
+    if (productId) {
+      loadProduct(productId)
     }
-  }, [isAuthenticated, isMerchant, products, fetchProducts])
+  }, [productId, loadProduct])
 
   // Fetch category name if categoryId exists but category data is not loaded
   useEffect(() => {
@@ -150,25 +152,25 @@ export default function ProductDetailPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm" asChild>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
+          <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
+            <Button variant="outline" size="sm" asChild className="shrink-0">
               <Link href="/merchant/products">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Link>
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold">{product.name}</h1>
-              <p className="text-muted-foreground">
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold truncate">{product.name}</h1>
+              <p className="text-sm sm:text-base text-muted-foreground truncate">
                 {product.description || 'No description provided'}
               </p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" asChild>
+          <div className="flex items-center space-x-2 shrink-0 self-end sm:self-auto">
+            <Button variant="outline" asChild size="sm">
               <Link href={`/merchant/products/${product.id}/edit`}>
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
@@ -176,6 +178,7 @@ export default function ProductDetailPage() {
             </Button>
             <Button
               variant="outline"
+              size="sm"
               onClick={handleDeleteProduct}
               disabled={isDeleting}
               className="text-destructive hover:text-destructive"

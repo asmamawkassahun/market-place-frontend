@@ -38,7 +38,8 @@ import {
   ChevronDown,
   BarChart3,
   Shield,
-  Layers
+  Layers,
+  Plus
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -71,37 +72,16 @@ export function Navigation() {
     { name: 'Help & Support', href: '/help', icon: HelpCircle },
   ]
 
-  const merchantNavItems = [
-    { name: 'Dashboard', href: '/merchant/dashboard' },
-    { name: 'Products', href: '/merchant/products' },
-    { name: 'Orders', href: '/merchant/orders' },
-    { name: 'Inventory', href: '/merchant/inventory' },
-    { name: 'Chat', href: '/merchant/chat' },
-  ]
-
   const merchantAccountItems = [
     { name: 'Analytics', href: '/merchant/analytics', icon: BarChart3 },
     { name: 'Store Profile', href: '/merchant/profile', icon: Store },
     { name: 'Settings', href: '/merchant/settings', icon: Settings },
   ]
 
-  const adminNavItems = [
-    { name: 'Dashboard', href: '/admin/dashboard' },
-    { name: 'Users', href: '/admin/users' },
-    { name: 'Merchants', href: '/admin/merchants' },
-    { name: 'Reports', href: '/admin/chat/reports' },
-  ]
-
   const adminAccountItems = [
-    { name: 'Analytics', href: '/admin/dashboard', icon: BarChart3 },
+    { name: 'Dashboard', href: '/admin/dashboard', icon: BarChart3 },
     { name: 'System', href: '/admin/merchants', icon: Shield },
   ]
-
-  const getNavItems = () => {
-    if (isAdminRoute && isAdmin) return adminNavItems
-    if (isMerchantRoute && isMerchant) return merchantNavItems
-    return customerNavItems
-  }
 
   const getAccountItems = () => {
     if (isAdminRoute && isAdmin) return adminAccountItems
@@ -126,38 +106,66 @@ export function Navigation() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-xs">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 w-full items-center justify-between gap-3 md:gap-6">
-          {/* Brand Logo */}
-          <Link href="/" className="flex items-center space-x-2 shrink-0 group">
-            <Image
-              src="/logo.svg"
-              alt="MAJET Marketplace"
-              width={140}
-              height={36}
-              className="h-8 md:h-9 w-auto object-contain transition-transform group-hover:scale-105"
-              priority
-            />
-          </Link>
+          {/* Brand Logo & Portal Indicator */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <Link href={isMerchantRoute ? "/merchant/dashboard" : isAdminRoute ? "/admin/dashboard" : "/"} className="flex items-center space-x-2 group">
+              <Image
+                src="/logo.svg"
+                alt="MAJET Marketplace"
+                width={140}
+                height={36}
+                className="h-8 md:h-9 w-auto object-contain transition-transform group-hover:scale-105"
+                priority
+              />
+            </Link>
+            {isMerchantRoute && (
+              <Badge variant="outline" className="hidden sm:inline-flex bg-primary/10 text-primary border-primary/20 text-[11px] font-semibold px-2 py-0.5">
+                Seller Center
+              </Badge>
+            )}
+            {isAdminRoute && (
+              <Badge variant="outline" className="hidden sm:inline-flex bg-destructive/10 text-destructive border-destructive/20 text-[11px] font-semibold px-2 py-0.5">
+                Admin Panel
+              </Badge>
+            )}
+          </div>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0">
-            {getNavItems().map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap",
-                    isActive
-                      ? "bg-primary/10 text-primary font-semibold"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                  )}
-                >
-                  {item.name}
-                </Link>
-              )
-            })}
-          </nav>
+          {/* Desktop Navigation Links - Shown for Customer Routes */}
+          {isCustomerRoute && (
+            <nav className="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0">
+              {customerNavItems.map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      "px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap",
+                      isActive
+                        ? "bg-primary/10 text-primary font-semibold"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                    )}
+                  >
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </nav>
+          )}
+
+          {/* Merchant Route Quick Storefront Link */}
+          {isMerchantRoute && (
+            <div className="hidden md:flex items-center">
+              <Link
+                href="/products"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground rounded-full border border-border/70 hover:bg-muted/60 transition-colors"
+                title="Browse products as a customer"
+              >
+                <Store className="h-3.5 w-3.5 text-primary" />
+                <span>View Customer Marketplace</span>
+              </Link>
+            </div>
+          )}
 
           {/* Customer / Visitor Live Search Bar */}
           {isCustomerRoute && (
@@ -177,6 +185,16 @@ export function Navigation() {
 
           {/* Right Side Actions */}
           <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
+            {/* Quick Add Product Button for Merchants */}
+            {isMerchantRoute && (
+              <Button size="sm" asChild className="h-8.5 gap-1.5 text-xs font-semibold shadow-xs">
+                <Link href="/merchant/products/new">
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Add Product</span>
+                </Link>
+              </Button>
+            )}
+
             {/* Shopping Cart (Always visible on customer routes for authenticated and guest users) */}
             {isCustomerRoute && (
               <Link href="/cart">
@@ -300,8 +318,8 @@ export function Navigation() {
             )}
           </div>
 
-          {/* Mobile Right Bar: Cart & Mobile Navigation */}
-          <div className="flex items-center gap-1 lg:hidden">
+          {/* Mobile Right Bar: Cart, Quick Actions & Mobile Navigation */}
+          <div className="flex items-center gap-1.5 lg:hidden">
             {isCustomerRoute && (
               <Link href="/cart">
                 <Button variant="ghost" size="icon" className="relative cursor-pointer" title="Cart">
@@ -313,6 +331,14 @@ export function Navigation() {
                   )}
                 </Button>
               </Link>
+            )}
+            {isMerchantRoute && (
+              <Button size="sm" variant="outline" asChild className="h-8 px-2.5 text-xs gap-1 border-primary/30 text-primary">
+                <Link href="/merchant/products/new">
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>New</span>
+                </Link>
+              </Button>
             )}
             <MobileNavigation />
           </div>

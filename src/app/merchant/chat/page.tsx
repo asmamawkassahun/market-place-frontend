@@ -73,10 +73,10 @@ export default function MerchantChatPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Customer Messages</h1>
-          <p className="text-muted-foreground">Chat with your customers about their orders</p>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Customer Messages</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Chat with your customers about their orders</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">

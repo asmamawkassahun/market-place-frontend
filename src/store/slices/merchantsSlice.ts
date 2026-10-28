@@ -104,10 +104,12 @@ export const createMerchant = createAsyncThunk(
 
 export const updateMerchant = createAsyncThunk(
   'merchants/updateMerchant',
-  async (data: any, { rejectWithValue }) => {
+  async (payload: any, { rejectWithValue }) => {
     try {
-      const response = await merchantsApi.update(data)
-      return response.data
+      // Handle both direct data object and { id, data } wrapper
+      const updateData = payload?.data !== undefined ? payload.data : payload
+      const response = await merchantsApi.update(updateData)
+      return response.data || response
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update merchant')
     }
@@ -257,12 +259,15 @@ const merchantsSlice = createSlice({
       })
       .addCase(updateMerchant.fulfilled, (state, action) => {
         state.isLoading = false
-        const index = state.merchants.findIndex(m => m.id === action.payload.data.id)
-        if (index !== -1) {
-          state.merchants[index] = action.payload.data
-        }
-        if (state.currentMerchant?.id === action.payload.data.id) {
-          state.currentMerchant = action.payload.data
+        const updated = action.payload?.data || action.payload
+        if (updated && updated.id) {
+          const index = state.merchants.findIndex(m => m.id === updated.id)
+          if (index !== -1) {
+            state.merchants[index] = updated
+          }
+          if (state.currentMerchant?.id === updated.id || !state.currentMerchant) {
+            state.currentMerchant = updated
+          }
         }
       })
       .addCase(updateMerchant.rejected, (state, action) => {

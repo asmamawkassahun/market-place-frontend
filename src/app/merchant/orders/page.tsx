@@ -147,12 +147,12 @@ export default function MerchantOrdersPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6 md:mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Order Management</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold">Order Management</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Manage and fulfill customer orders
             </p>
           </div>
@@ -280,7 +280,7 @@ export default function MerchantOrdersPage() {
             {filteredOrders.map((order) => (
               <Card key={order.id}>
                 <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4">
                     <div>
                       <div className="flex items-center space-x-2 mb-2">
                         <h3 className="font-semibold">Order #{order.id.slice(-8)}</h3>

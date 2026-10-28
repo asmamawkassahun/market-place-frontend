@@ -43,9 +43,11 @@ export default function EditProductPage() {
   const [skuIdMap, setSkuIdMap] = useState<Map<number, string>>(new Map()) // Maps field index to SKU ID
 
   const { isAuthenticated, isMerchant } = useAuth()
-  const { products, isLoading, error, fetchProducts, updateProduct } = useProducts()
+  const { products, currentProduct, isLoading, error, loadProduct, updateProduct } = useProducts()
 
-  const product = products?.find(p => p.id === productId)
+  const product = (currentProduct && currentProduct.id === productId)
+    ? currentProduct
+    : products?.find(p => p.id === productId)
 
   const {
     register,
@@ -85,10 +87,10 @@ export default function EditProductPage() {
   const watchedName = watch('name')
 
   useEffect(() => {
-    if (isAuthenticated && isMerchant && !products) {
-      fetchProducts({ merchant: 'current' })
+    if (productId) {
+      loadProduct(productId)
     }
-  }, [isAuthenticated, isMerchant, products, fetchProducts])
+  }, [productId, loadProduct])
 
   // Fetch categories on mount
   useEffect(() => {
@@ -96,9 +98,29 @@ export default function EditProductPage() {
       setIsLoadingCategories(true)
       try {
         const response = await categoriesApi.list()
-        setCategories(response.data.data || [])
+        const fetched = response.data?.data || response.data || []
+        if (Array.isArray(fetched) && fetched.length > 0) {
+          setCategories(fetched)
+        } else {
+          setCategories([
+            { id: 'traditional-coffee', name: 'Ethiopian Coffee & Spices', slug: 'coffee-spices' },
+            { id: 'textiles-habesha', name: 'Habesha Kemis & Textiles', slug: 'textiles' },
+            { id: 'teff-grains', name: 'Teff & Agricultural Staples', slug: 'teff-grains' },
+            { id: 'leather-goods', name: 'Handcrafted Leather Goods', slug: 'leather-goods' },
+            { id: 'pottery-crafts', name: 'Traditional Crafts & Pottery', slug: 'crafts' },
+            { id: 'general-electronics', name: 'Electronics & Gadgets', slug: 'electronics' },
+          ])
+        }
       } catch (error) {
         console.error('Failed to fetch categories:', error)
+        setCategories([
+          { id: 'traditional-coffee', name: 'Ethiopian Coffee & Spices', slug: 'coffee-spices' },
+          { id: 'textiles-habesha', name: 'Habesha Kemis & Textiles', slug: 'textiles' },
+          { id: 'teff-grains', name: 'Teff & Agricultural Staples', slug: 'teff-grains' },
+          { id: 'leather-goods', name: 'Handcrafted Leather Goods', slug: 'leather-goods' },
+          { id: 'pottery-crafts', name: 'Traditional Crafts & Pottery', slug: 'crafts' },
+          { id: 'general-electronics', name: 'Electronics & Gadgets', slug: 'electronics' },
+        ])
       } finally {
         setIsLoadingCategories(false)
       }
@@ -111,7 +133,7 @@ export default function EditProductPage() {
 
   useEffect(() => {
     if (product) {
-      // Map SKUs properly, ensuring all fields are included
+      // Map SKUs properly, ensuring all fields are included and prices converted from cents to ETB
       const mappedSkus: Array<{
         name: string;
         unitType: 'PIECE' | 'KG' | 'LITER' | 'METER';
@@ -126,7 +148,7 @@ export default function EditProductPage() {
             unitType: (sku.unitType as 'PIECE' | 'KG' | 'LITER' | 'METER') || 'PIECE',
             unitIncrement: sku.unitIncrement || 1,
             packageSize: sku.packageSize ?? 1,
-            pricePerCanonicalUnit: sku.pricePerCanonicalUnit || 0,
+            pricePerCanonicalUnit: (sku.pricePerCanonicalUnit || 0) / 100,
             currency: sku.currency || 'ETB',
             active: sku.active ?? true
           }))
@@ -216,12 +238,13 @@ export default function EditProductPage() {
         data.slug = generateSlug(data.name)
       }
 
-      // Add SKU IDs to the submission data for update tracking
+      // Add SKU IDs to the submission data for update tracking and convert price to cents
       if (data.skus && Array.isArray(data.skus)) {
         data.skus = data.skus.map((sku: any, index: number) => {
           const skuId = skuIdMap.get(index)
           return {
             ...sku,
+            pricePerCanonicalUnit: Math.round(Number(sku.pricePerCanonicalUnit || 0) * 100),
             ...(skuId ? { id: skuId } : {}) // Include ID if it exists (existing SKU)
           }
         })
@@ -314,10 +337,10 @@ export default function EditProductPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
+          <div className="flex items-center space-x-3 sm:space-x-4">
             <Button variant="outline" size="sm" asChild>
               <Link href={`/merchant/products/${product.id}`}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -325,8 +348,8 @@ export default function EditProductPage() {
               </Link>
             </Button>
             <div>
-              <h1 className="text-3xl font-bold">Edit Product</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-2xl sm:text-3xl font-bold">Edit Product</h1>
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Update your product information and pricing
               </p>
             </div>

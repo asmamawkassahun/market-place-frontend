@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { 
   Plus, 
@@ -29,7 +28,6 @@ export default function MerchantProductsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 
   const router = useRouter()
   const { isAuthenticated, isMerchant } = useAuth()
@@ -86,36 +84,21 @@ export default function MerchantProductsPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Product Management</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold">Product Management</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Manage your products, inventory, and pricing
             </p>
           </div>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Product
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Create New Product</DialogTitle>
-              </DialogHeader>
-              <div className="p-4">
-                <Button asChild className="w-full">
-                  <Link href="/merchant/products/new">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Go to Product Creation Form
-                  </Link>
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button asChild className="self-start sm:self-auto shadow-xs">
+            <Link href="/merchant/products/new">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Product
+            </Link>
+          </Button>
         </div>
 
         {/* Filters */}
@@ -192,9 +175,11 @@ export default function MerchantProductsPage() {
                     : 'You haven\'t created any products yet'
                   }
                 </p>
-                <Button onClick={() => setIsCreateDialogOpen(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Your First Product
+                <Button asChild>
+                  <Link href="/merchant/products/new">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Your First Product
+                  </Link>
                 </Button>
               </div>
             </CardContent>
@@ -202,7 +187,7 @@ export default function MerchantProductsPage() {
         ) : (
           <div className="space-y-6">
             {/* Products Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {filteredProducts.map((product) => (
                 <Card key={product.id} className="overflow-hidden">
                   <div className="aspect-square bg-muted relative">

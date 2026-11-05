@@ -3,7 +3,7 @@ import axios from 'axios'
 // Create axios instance
 const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 const api = axios.create({
-  baseURL: rawApiUrl.replace(/\/+$/, ''),
+  baseURL: (rawApiUrl || '').replace(/\/+$/, ''),
   timeout: 60000, // 60s to accommodate Render cold starts
   headers: {
     'Content-Type': 'application/json',

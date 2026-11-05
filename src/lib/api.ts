@@ -2,9 +2,10 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ApiResponse } from '@/types';
 
 // Create axios instance
+const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 const api: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
-  timeout: 10000,
+  baseURL: rawApiUrl.replace(/\/+$/, ''),
+  timeout: 60000, // 60s to accommodate Render cold starts
   headers: {
     'Content-Type': 'application/json',
   },
